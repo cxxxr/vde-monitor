@@ -16,6 +16,7 @@ export const createTmuxActions = (adapter: TmuxAdapter, config: AgentMonitorConf
   const dangerPatterns = compileDangerPatterns(config.dangerCommandPatterns);
   const enterKey = config.input.enterKey || "C-m";
   const enterDelayMs = config.input.enterDelayMs ?? 0;
+  const bracketedPaste = (value: string) => `\u001b[200~${value}\u001b[201~`;
 
   const sendText = async (paneId: string, text: string, enter = true) => {
     if (!text || text.trim().length === 0) {
@@ -37,15 +38,18 @@ export const createTmuxActions = (adapter: TmuxAdapter, config: AgentMonitorConf
     ]);
 
     const normalized = text.replace(/\r\n/g, "\n");
-    const lines = normalized.split("\n");
-    for (let i = 0; i < lines.length; i += 1) {
-      const line = lines[i] ?? "";
-      const result = await adapter.run(["send-keys", "-l", "-t", paneId, line]);
+    if (normalized.includes("\n")) {
+      const result = await adapter.run([
+        "send-keys",
+        "-l",
+        "-t",
+        paneId,
+        bracketedPaste(normalized),
+      ]);
       if (result.exitCode !== 0) {
         return { ok: false, error: buildError("INTERNAL", result.stderr || "send-keys failed") };
       }
-      const isLast = i === lines.length - 1;
-      if (!isLast || enter) {
+      if (enter) {
         if (enterDelayMs > 0) {
           await new Promise((resolve) => setTimeout(resolve, enterDelayMs));
         }
@@ -56,6 +60,24 @@ export const createTmuxActions = (adapter: TmuxAdapter, config: AgentMonitorConf
             error: buildError("INTERNAL", enterResult.stderr || "send-keys Enter failed"),
           };
         }
+      }
+      return { ok: true as const };
+    }
+
+    const result = await adapter.run(["send-keys", "-l", "-t", paneId, normalized]);
+    if (result.exitCode !== 0) {
+      return { ok: false, error: buildError("INTERNAL", result.stderr || "send-keys failed") };
+    }
+    if (enter) {
+      if (enterDelayMs > 0) {
+        await new Promise((resolve) => setTimeout(resolve, enterDelayMs));
+      }
+      const enterResult = await adapter.run(["send-keys", "-t", paneId, enterKey]);
+      if (enterResult.exitCode !== 0) {
+        return {
+          ok: false,
+          error: buildError("INTERNAL", enterResult.stderr || "send-keys Enter failed"),
+        };
       }
     }
     return { ok: true as const };
