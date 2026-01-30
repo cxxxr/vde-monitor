@@ -1,5 +1,5 @@
 import { defaultDangerCommandPatterns, defaultDangerKeys } from "@agent-monitor/shared";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, CornerDownLeft } from "lucide-react";
 import React from "react";
 import { Link, useParams } from "react-router-dom";
 import { useStickToBottom } from "use-stick-to-bottom";
@@ -304,19 +304,25 @@ export const SessionDetailPage = () => {
                   rows={2}
                   className="border-latte-surface2 text-latte-text focus:border-latte-lavender focus:ring-latte-lavender/30 min-h-[64px] min-w-0 flex-1 resize-y rounded-2xl border bg-white/70 px-4 py-2 text-sm shadow-sm outline-none transition focus:ring-2"
                 />
-                <Button onClick={handleSendText} className="shrink-0 self-start">
-                  Send
-                </Button>
+                <div className="flex shrink-0 flex-col items-end gap-2 self-start">
+                  <Button onClick={handleSendText}>Send</Button>
+                  <button
+                    type="button"
+                    onClick={() => setAutoEnter((prev) => !prev)}
+                    aria-pressed={autoEnter}
+                    title="Auto-enter after send"
+                    className={`group inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] transition ${
+                      autoEnter
+                        ? "border-latte-lavender/60 bg-latte-lavender/10 text-latte-lavender shadow-[inset_0_0_0_1px_rgba(114,135,253,0.12)]"
+                        : "border-latte-surface2/70 text-latte-subtext0 hover:border-latte-overlay1 hover:text-latte-text"
+                    }`}
+                  >
+                    <span className="text-[9px] font-semibold tracking-[0.3em]">Auto</span>
+                    <CornerDownLeft className="h-3.5 w-3.5" />
+                    <span className="sr-only">Auto-enter</span>
+                  </button>
+                </div>
               </div>
-              <label className="text-latte-subtext0 flex items-center gap-2 text-xs">
-                <input
-                  type="checkbox"
-                  checked={autoEnter}
-                  onChange={(event) => setAutoEnter(event.target.checked)}
-                  className="border-latte-surface2 text-latte-lavender focus:ring-latte-lavender/40 accent-latte-lavender h-4 w-4 rounded"
-                />
-                Auto-enter after send
-              </label>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <Button
