@@ -82,7 +82,7 @@ export const defaultConfig: AgentMonitorConfig = {
   input: { maxTextLength: 2000 },
   screen: {
     mode: "text",
-    defaultLines: 120,
+    defaultLines: 2000,
     maxLines: 2000,
     joinLines: false,
     altScreen: "auto",
