@@ -1,0 +1,12 @@
+{
+  "name": "@agent-monitor/tmux",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "execa": "^9.6.0"
+  }
+}

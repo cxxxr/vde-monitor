@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  font-family: "IBM Plex Sans", sans-serif;
+  background:
+    radial-gradient(1200px 600px at 20% 0%, rgba(114, 135, 253, 0.18), transparent 55%),
+    radial-gradient(900px 500px at 90% 10%, rgba(254, 100, 11, 0.12), transparent 60%), #eff1f5;
+  color: #4c4f69;
+  min-height: 100vh;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.08;
+  background-image: radial-gradient(rgba(76, 79, 105, 0.15) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mix-blend-mode: multiply;
+}
+
+* {
+  box-sizing: border-box;
+}

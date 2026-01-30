@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["apps/web/src/*"],
+      "@agent-monitor/*": ["packages/*/src"]
+    }
+  },
+  "include": ["apps/**/*", "packages/**/*"],
+  "exclude": ["**/dist", "**/node_modules"]
+}
