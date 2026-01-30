@@ -7,6 +7,7 @@ import { useStickToBottom } from "use-stick-to-bottom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { renderAnsi } from "@/lib/ansi";
 import { useSessions } from "@/state/session-context";
 
@@ -238,20 +239,19 @@ export const SessionDetailPage = () => {
         <Card className="flex min-w-0 flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <Button
-                variant={mode === "text" ? "primary" : "ghost"}
-                size="sm"
-                onClick={() => setMode("text")}
+              <Tabs
+                value={mode}
+                onValueChange={(value) => {
+                  if (value === "text" || value === "image") {
+                    setMode(value);
+                  }
+                }}
               >
-                Text
-              </Button>
-              <Button
-                variant={mode === "image" ? "primary" : "ghost"}
-                size="sm"
-                onClick={() => setMode("image")}
-              >
-                Image
-              </Button>
+                <TabsList aria-label="Screen mode">
+                  <TabsTrigger value="text">Text</TabsTrigger>
+                  <TabsTrigger value="image">Image</TabsTrigger>
+                </TabsList>
+              </Tabs>
             </div>
             <Button variant="ghost" size="sm" onClick={refreshScreen}>
               Refresh
