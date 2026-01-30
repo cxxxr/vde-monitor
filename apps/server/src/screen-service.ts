@@ -13,17 +13,6 @@ const isValidTty = (tty: string) => TTY_PATH_PATTERN.test(tty);
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const generateOscTitle = (title: string) => `\u001b]0;${title}\u0007`;
-
-const setTtyTitle = async (tty: string, title: string) => {
-  try {
-    await fs.writeFile(tty, generateOscTitle(title));
-    return true;
-  } catch {
-    return false;
-  }
-};
-
 const parseBounds = (input: string) => {
   const parts = input
     .split(",")
@@ -254,7 +243,6 @@ export const captureAlacrittyScreen = async (tty: string, options: CaptureOption
     return null;
   }
   const titleTag = `am:${tty.replace("/dev/", "").replace(/\//g, "-")}`;
-  const titleSet = await setTtyTitle(tty, titleTag);
   await focusAlacritty();
   await wait(150);
   if (options.paneId) {
@@ -269,9 +257,6 @@ export const captureAlacrittyScreen = async (tty: string, options: CaptureOption
     options.cropPane !== false && options.paneId
       ? await getPaneGeometry(options.paneId, options.tmux)
       : null;
-  if (titleSet) {
-    await setTtyTitle(tty, "");
-  }
   if (!bounds) {
     return null;
   }

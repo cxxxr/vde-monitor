@@ -86,7 +86,36 @@ export const SessionDetailPage = () => {
   const [ctrlHeld, setCtrlHeld] = React.useState(false);
   const refreshInFlightRef = React.useRef(false);
   const renderedScreen = React.useMemo(() => renderAnsi(screen || "No screen data"), [screen]);
-  const { scrollRef, contentRef } = useStickToBottom({ initial: "instant", resize: "instant" });
+  const { scrollRef, contentRef, stopScroll } = useStickToBottom({
+    initial: "instant",
+    resize: "instant",
+  });
+  const prevModeRef = React.useRef<"text" | "image">(mode);
+  const snapToBottomRef = React.useRef(false);
+
+  React.useEffect(() => {
+    const prevMode = prevModeRef.current;
+    if (prevMode === "image" && mode === "text") {
+      snapToBottomRef.current = true;
+    }
+    prevModeRef.current = mode;
+  }, [mode]);
+
+  React.useLayoutEffect(() => {
+    if (!snapToBottomRef.current || mode !== "text") {
+      return;
+    }
+    const scrollEl = scrollRef.current;
+    if (!scrollEl) {
+      return;
+    }
+    stopScroll?.();
+    scrollEl.scrollTop = scrollEl.scrollHeight;
+    requestAnimationFrame(() => {
+      scrollEl.scrollTop = scrollEl.scrollHeight;
+    });
+    snapToBottomRef.current = false;
+  }, [mode, screen, renderedScreen, scrollRef, stopScroll]);
 
   const refreshScreen = React.useCallback(async () => {
     if (!paneId) return;

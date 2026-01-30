@@ -376,7 +376,7 @@ export const createSessionMonitor = (adapter: TmuxAdapter, config: AgentMonitorC
       }
 
       const windowActivityAt = toIsoFromEpochSeconds(pane.windowActivity);
-      if (windowActivityAt) {
+      if (windowActivityAt && (!pipeAttached || pipeConflict)) {
         updateOutputAt(windowActivityAt);
       }
 
