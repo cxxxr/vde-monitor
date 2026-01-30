@@ -169,6 +169,7 @@ export const configSchema = z.object({
     defaultLines: z.number(),
     maxLines: z.number(),
     joinLines: z.boolean(),
+    ansi: z.boolean().default(true),
     altScreen: z.enum(["auto", "on", "off"]),
     image: z.object({
       enabled: z.boolean(),

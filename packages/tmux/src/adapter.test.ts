@@ -4,7 +4,7 @@ import { createTmuxAdapter } from "./adapter.js";
 
 vi.mock("execa", () => {
   return {
-    execa: vi.fn(async (_cmd: string, _args: string[]) => ({
+    execa: vi.fn(async () => ({
       stdout: "ok",
       stderr: "",
       exitCode: 0,

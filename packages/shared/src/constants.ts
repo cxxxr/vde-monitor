@@ -85,6 +85,7 @@ export const defaultConfig: AgentMonitorConfig = {
     defaultLines: 2000,
     maxLines: 2000,
     joinLines: false,
+    ansi: true,
     altScreen: "auto",
     image: {
       enabled: false,

@@ -26,8 +26,20 @@ describe("createPipeManager", () => {
     });
 
     expect(result).toEqual({ attached: true, conflict: false });
-    expect(adapter.run).toHaveBeenCalledWith(["pipe-pane", "-o", "-t", "%2", 'cat >> "/tmp/test.log"']);
-    expect(adapter.run).toHaveBeenCalledWith(["set-option", "-t", "%2", "@agent-monitor_pipe", "1"]);
+    expect(adapter.run).toHaveBeenCalledWith([
+      "pipe-pane",
+      "-o",
+      "-t",
+      "%2",
+      'cat >> "/tmp/test.log"',
+    ]);
+    expect(adapter.run).toHaveBeenCalledWith([
+      "set-option",
+      "-t",
+      "%2",
+      "@agent-monitor_pipe",
+      "1",
+    ]);
   });
 
   it("escapes quotes in log path when attaching", async () => {
@@ -35,7 +47,7 @@ describe("createPipeManager", () => {
       run: vi.fn().mockResolvedValue({ stdout: "", stderr: "", exitCode: 0 }),
     };
     const pipeManager = createPipeManager(adapter);
-    await pipeManager.attachPipe("%4", "/tmp/\"weird\".log", {
+    await pipeManager.attachPipe("%4", '/tmp/"weird".log', {
       panePipe: false,
       pipeTagValue: null,
     });
@@ -71,14 +83,8 @@ describe("createPipeManager", () => {
       run: vi.fn().mockResolvedValue({ stdout: "", stderr: "", exitCode: 0 }),
     };
     const pipeManager = createPipeManager(adapter);
-    expect(
-      pipeManager.hasConflict({ panePipe: true, pipeTagValue: null }),
-    ).toBe(true);
-    expect(
-      pipeManager.hasConflict({ panePipe: true, pipeTagValue: "1" }),
-    ).toBe(false);
-    expect(
-      pipeManager.hasConflict({ panePipe: false, pipeTagValue: null }),
-    ).toBe(false);
+    expect(pipeManager.hasConflict({ panePipe: true, pipeTagValue: null })).toBe(true);
+    expect(pipeManager.hasConflict({ panePipe: true, pipeTagValue: "1" })).toBe(false);
+    expect(pipeManager.hasConflict({ panePipe: false, pipeTagValue: null })).toBe(false);
   });
 });

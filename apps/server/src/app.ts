@@ -265,6 +265,7 @@ export const createApp = ({ config, monitor, tmuxActions }: AppContext) => {
                 paneId: message.data.paneId,
                 lines: lineCount,
                 joinLines: config.screen.joinLines,
+                includeAnsi: config.screen.ansi,
                 altScreen: config.screen.altScreen,
                 alternateOn: target.alternateOn,
               });
@@ -335,6 +336,7 @@ export const createApp = ({ config, monitor, tmuxActions }: AppContext) => {
               paneId: message.data.paneId,
               lines: lineCount,
               joinLines: config.screen.joinLines,
+              includeAnsi: config.screen.ansi,
               altScreen: config.screen.altScreen,
               alternateOn: target.alternateOn,
             });
@@ -381,6 +383,7 @@ export const createApp = ({ config, monitor, tmuxActions }: AppContext) => {
             paneId: message.data.paneId,
             lines: lineCount,
             joinLines: config.screen.joinLines,
+            includeAnsi: config.screen.ansi,
             altScreen: config.screen.altScreen,
             alternateOn: target.alternateOn,
           });

@@ -6,6 +6,7 @@ import { Link, useParams } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { renderAnsi } from "@/lib/ansi";
 import { useSessions } from "@/state/session-context";
 
 const stateTone = (state: string) => {
@@ -82,6 +83,7 @@ export const SessionDetailPage = () => {
   const [ctrlHeld, setCtrlHeld] = React.useState(false);
   const screenRef = React.useRef<HTMLDivElement | null>(null);
   const refreshInFlightRef = React.useRef(false);
+  const renderedScreen = React.useMemo(() => renderAnsi(screen || "No screen data"), [screen]);
 
   const refreshScreen = React.useCallback(async () => {
     if (!paneId) return;
@@ -286,9 +288,10 @@ export const SessionDetailPage = () => {
                 className="w-full min-w-0 max-w-full overflow-x-auto overflow-y-auto"
                 style={{ maxHeight: "60vh" }}
               >
-                <pre className="text-latte-text w-max whitespace-pre font-mono text-xs">
-                  {screen || "No screen data"}
-                </pre>
+                <pre
+                  className="text-latte-text w-max whitespace-pre font-mono text-xs"
+                  dangerouslySetInnerHTML={{ __html: renderedScreen }}
+                />
               </div>
             )}
           </div>

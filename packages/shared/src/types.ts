@@ -168,6 +168,7 @@ export type AgentMonitorConfig = {
     defaultLines: number;
     maxLines: number;
     joinLines: boolean;
+    ansi: boolean;
     altScreen: "auto" | "on" | "off";
     image: {
       enabled: boolean;

@@ -23,11 +23,13 @@ describe("createScreenCapture", () => {
       paneId: "%1",
       lines: 2,
       joinLines: true,
+      includeAnsi: true,
       altScreen: "on",
       alternateOn: false,
     });
 
     expect(calls[0]).toContain("-J");
+    expect(calls[0]).toContain("-e");
     expect(calls[0]).toContain("-a");
     expect(calls[0]).toContain("-S");
     expect(calls[0]).toContain("-E");
@@ -55,6 +57,7 @@ describe("createScreenCapture", () => {
       paneId: "%1",
       lines: 1,
       joinLines: false,
+      includeAnsi: true,
       altScreen: "auto",
       alternateOn: false,
     });
@@ -82,6 +85,7 @@ describe("createScreenCapture", () => {
       paneId: "%1",
       lines: 1,
       joinLines: false,
+      includeAnsi: true,
       altScreen: "auto",
       alternateOn: true,
     });
@@ -107,6 +111,7 @@ describe("createScreenCapture", () => {
       paneId: "%1",
       lines: 3,
       joinLines: false,
+      includeAnsi: true,
       altScreen: "off",
       alternateOn: false,
     });
@@ -132,6 +137,7 @@ describe("createScreenCapture", () => {
       paneId: "%1",
       lines: 3,
       joinLines: false,
+      includeAnsi: true,
       altScreen: "off",
       alternateOn: false,
     });
@@ -159,6 +165,7 @@ describe("createScreenCapture", () => {
       paneId: "%1",
       lines: 1,
       joinLines: false,
+      includeAnsi: true,
       altScreen: "off",
       alternateOn: false,
     });
@@ -185,6 +192,7 @@ describe("createScreenCapture", () => {
         paneId: "%1",
         lines: 1,
         joinLines: false,
+        includeAnsi: true,
         altScreen: "off",
         alternateOn: false,
       }),
@@ -209,6 +217,7 @@ describe("createScreenCapture", () => {
       paneId: "%1",
       lines: 1,
       joinLines: false,
+      includeAnsi: true,
       altScreen: "off",
       alternateOn: true,
     });

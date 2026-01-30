@@ -4,6 +4,7 @@ export type TextCaptureOptions = {
   paneId: string;
   lines: number;
   joinLines: boolean;
+  includeAnsi: boolean;
   altScreen: "auto" | "on" | "off";
   alternateOn: boolean;
 };
@@ -63,6 +64,9 @@ export const createScreenCapture = (adapter: TmuxAdapter) => {
     const args = ["capture-pane", "-p", "-t", options.paneId];
     if (options.joinLines) {
       args.push("-J");
+    }
+    if (options.includeAnsi) {
+      args.push("-e");
     }
     const useAlt = resolveAltFlag(options.altScreen, options.alternateOn);
     if (useAlt) {
