@@ -118,8 +118,16 @@ const adjustLowContrast = (html: string, theme: Theme): string => {
   const nodes = Array.from(doc.querySelectorAll<HTMLElement>("[style]"));
   nodes.forEach((node) => {
     const bg = parseColor(node.style.backgroundColor);
+    if (!bg) return;
+    if (theme === "latte") {
+      const bgLum = luminance(bg);
+      if (bgLum > 0.28) return;
+      node.style.backgroundColor = fallback.background;
+      node.style.color = fallback.text;
+      return;
+    }
     const fg = parseColor(node.style.color);
-    if (!bg || !fg) return;
+    if (!fg) return;
     if (contrastRatio(bg, fg) >= 3) return;
     node.style.backgroundColor = fallback.background;
     node.style.color = fallback.text;
