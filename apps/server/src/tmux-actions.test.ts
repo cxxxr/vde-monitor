@@ -58,3 +58,18 @@ describe("createTmuxActions.sendText", () => {
     expect(adapter.run).toHaveBeenNthCalledWith(3, ["send-keys", "-t", "%1", "C-m"]);
   });
 });
+
+describe("createTmuxActions.sendKeys", () => {
+  it("blocks configured danger keys", async () => {
+    const adapter = {
+      run: vi.fn(async () => ({ stdout: "", stderr: "", exitCode: 0 })),
+    };
+    const tmuxActions = createTmuxActions(adapter, defaultConfig);
+
+    const result = await tmuxActions.sendKeys("%1", ["C-c"]);
+
+    expect(result.ok).toBe(false);
+    expect(result.error?.code).toBe("DANGEROUS_COMMAND");
+    expect(adapter.run).not.toHaveBeenCalled();
+  });
+});

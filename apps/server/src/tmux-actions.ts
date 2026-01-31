@@ -14,6 +14,7 @@ const buildError = (code: ApiError["code"], message: string): ApiError => ({
 
 export const createTmuxActions = (adapter: TmuxAdapter, config: AgentMonitorConfig) => {
   const dangerPatterns = compileDangerPatterns(config.dangerCommandPatterns);
+  const dangerKeys = new Set(config.dangerKeys);
   const enterKey = config.input.enterKey || "C-m";
   const enterDelayMs = config.input.enterDelayMs ?? 0;
   const bracketedPaste = (value: string) => `\u001b[200~${value}\u001b[201~`;
@@ -87,6 +88,9 @@ export const createTmuxActions = (adapter: TmuxAdapter, config: AgentMonitorConf
     const allowed = new Set(allowedKeys);
     if (keys.length === 0 || keys.some((key) => !allowed.has(key as never))) {
       return { ok: false, error: buildError("INVALID_PAYLOAD", "invalid keys") };
+    }
+    if (keys.some((key) => dangerKeys.has(key))) {
+      return { ok: false, error: buildError("DANGEROUS_COMMAND", "dangerous key blocked") };
     }
     for (const key of keys) {
       const result = await adapter.run(["send-keys", "-t", paneId, key]);
