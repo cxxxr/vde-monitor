@@ -63,8 +63,8 @@ type SessionContextValue = {
 const SessionContext = createContext<SessionContextValue | null>(null);
 
 const TOKEN_KEY = "tmux-agent-monitor-token";
-const HEALTH_INTERVAL_MS = 15000;
-const HEALTH_TIMEOUT_MS = 45000;
+const HEALTH_INTERVAL_MS = 5000;
+const HEALTH_TIMEOUT_MS = 10000;
 
 const readTokenFromUrl = () => {
   const params = new URLSearchParams(window.location.search);
@@ -315,7 +315,7 @@ export const SessionProvider = ({ children }: { children: ReactNode }) => {
       share: true,
       shouldReconnect: () => true,
       reconnectAttempts: Infinity,
-      reconnectInterval: (attempt) => Math.min(10000, 500 * 2 ** attempt + Math.random() * 300),
+      reconnectInterval: () => 300 + Math.random() * 200,
       retryOnError: true,
       onOpen: () => {
         lastHealthAtRef.current = Date.now();
