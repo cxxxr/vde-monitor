@@ -751,6 +751,9 @@ export const SessionDetailPage = () => {
     if (textInputRef.current) {
       textInputRef.current.value = "";
     }
+    if (mode === "text") {
+      void scrollToBottom({ animation: "instant", ignoreEscapes: true });
+    }
   };
 
   const handleToggleDiff = (path: string) => {
