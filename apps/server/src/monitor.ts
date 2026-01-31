@@ -69,6 +69,32 @@ const normalizeFingerprint = (text: string) =>
     .join("\n")
     .trimEnd();
 
+const normalizeTitle = (value: string | null | undefined) => {
+  if (!value) return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+};
+
+const buildDefaultTitle = (
+  currentPath: string | null,
+  paneId: string,
+  sessionName: string,
+) => {
+  if (!currentPath) {
+    return `${sessionName}:${paneId}`;
+  }
+  const normalized = currentPath.replace(/\/+$/, "");
+  const parts = normalized.split("/");
+  const name = parts.pop() || "unknown";
+  return `${name}:${paneId}`;
+};
+
+const hostCandidates = (() => {
+  const host = os.hostname();
+  const short = host.split(".")[0] ?? host;
+  return new Set([host, short, `${host}.local`, `${short}.local`]);
+})();
+
 const toIsoFromEpochSeconds = (value: number | null) => {
   if (!value) {
     return null;
@@ -418,6 +444,11 @@ export const createSessionMonitor = (adapter: TmuxAdapter, config: AgentMonitorC
       const finalState = restoredSession ? restoredSession.state : estimated.state;
       const finalReason = restoredSession ? "restored" : estimated.reason;
 
+      const paneTitle = normalizeTitle(pane.paneTitle);
+      const defaultTitle = buildDefaultTitle(pane.currentPath, pane.paneId, pane.sessionName);
+      const title =
+        paneTitle && !hostCandidates.has(paneTitle) ? paneTitle : defaultTitle;
+
       const detail: SessionDetail = {
         paneId: pane.paneId,
         sessionName: pane.sessionName,
@@ -428,7 +459,7 @@ export const createSessionMonitor = (adapter: TmuxAdapter, config: AgentMonitorC
         currentCommand: pane.currentCommand,
         currentPath: pane.currentPath,
         paneTty: pane.paneTty,
-        title: pane.paneTitle,
+        title,
         agent,
         state: finalState,
         stateReason: finalReason,
