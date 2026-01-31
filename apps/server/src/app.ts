@@ -112,6 +112,17 @@ export const createApp = ({ config, monitor, tmuxActions }: AppContext) => {
     ws.send(JSON.stringify(message));
   };
 
+  const closeAllWsClients = (code: number, reason: string) => {
+    wsClients.forEach((ws) => {
+      try {
+        ws.close(code, reason);
+      } catch {
+        // Ignore close errors to ensure full cleanup.
+      }
+    });
+    wsClients.clear();
+  };
+
   const broadcast = (message: WsServerMessage) => {
     const payload = JSON.stringify(message);
     wsClients.forEach((ws) => ws.send(payload));
@@ -276,6 +287,7 @@ export const createApp = ({ config, monitor, tmuxActions }: AppContext) => {
   app.post("/api/admin/token/rotate", (c) => {
     const next = rotateToken();
     config.token = next.token;
+    closeAllWsClients(1008, "token rotated");
     return c.json({ token: next.token });
   });
 
