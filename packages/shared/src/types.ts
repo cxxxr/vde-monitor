@@ -267,6 +267,7 @@ export type PaneMeta = {
   windowIndex: number;
   paneIndex: number;
   windowActivity: number | null;
+  paneActivity: number | null;
   paneActive: boolean;
   currentCommand: string | null;
   currentPath: string | null;

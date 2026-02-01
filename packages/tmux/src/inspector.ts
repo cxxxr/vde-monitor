@@ -8,6 +8,7 @@ const format = [
   "#{window_index}",
   "#{pane_index}",
   "#{window_activity}",
+  "#{pane_activity}",
   "#{pane_active}",
   "#{pane_current_command}",
   "#{pane_current_path}",
@@ -57,7 +58,7 @@ const parseLine = (line: string): PaneMeta | null => {
     return null;
   }
   const parts = line.split("\t");
-  if (parts.length < 16) {
+  if (parts.length < 17) {
     return null;
   }
   const [
@@ -66,6 +67,7 @@ const parseLine = (line: string): PaneMeta | null => {
     windowIndexRaw,
     paneIndexRaw,
     windowActivityRaw,
+    paneActivityRaw,
     paneActiveRaw,
     currentCommand,
     currentPath,
@@ -94,6 +96,7 @@ const parseLine = (line: string): PaneMeta | null => {
     windowIndex: Number.parseInt(windowIndex, 10),
     paneIndex: Number.parseInt(paneIndex, 10),
     windowActivity: toEpochSeconds(windowActivityRaw),
+    paneActivity: toEpochSeconds(paneActivityRaw),
     paneActive: toBool(paneActiveRaw),
     currentCommand: toNullable(currentCommand),
     currentPath: toNullable(currentPath),

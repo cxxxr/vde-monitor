@@ -7,7 +7,7 @@ describe("createInspector", () => {
     const adapter = {
       run: vi.fn().mockResolvedValue({
         stdout:
-          "%1\tsession\t0\t1\t1700000000\t1\tcodex\t/path\t/dev/ttys001\t0\t1\t1\t1234\tTitle\tstart\t1\n",
+          "%1\tsession\t0\t1\t1700000000\t1700000001\t1\tcodex\t/path\t/dev/ttys001\t0\t1\t1\t1234\tTitle\tstart\t1\n",
         stderr: "",
         exitCode: 0,
       }),
@@ -21,6 +21,7 @@ describe("createInspector", () => {
       windowIndex: 0,
       paneIndex: 1,
       windowActivity: 1700000000,
+      paneActivity: 1700000001,
       paneActive: true,
       currentCommand: "codex",
       currentPath: "/path",
@@ -39,7 +40,7 @@ describe("createInspector", () => {
     const adapter = {
       run: vi.fn().mockResolvedValue({
         stdout:
-          "%1\tsession\t0\t1\t0\t0\tcmd\t/path\t/dev/ttys001\t0\t0\ton\t1234\tTitle\tstart\t1\n",
+          "%1\tsession\t0\t1\t0\t0\t0\tcmd\t/path\t/dev/ttys001\t0\t0\ton\t1234\tTitle\tstart\t1\n",
         stderr: "",
         exitCode: 0,
       }),
@@ -58,7 +59,7 @@ describe("createInspector", () => {
     const adapter = {
       run: vi.fn().mockResolvedValue({
         stdout:
-          "%1\tsession\t0\t1\t1700000000\ttrue\tcmd\t/path\t/dev/ttys001\ttrue\ttrue\ttrue\t1234\tTitle\tstart\t1\n",
+          "%1\tsession\t0\t1\t1700000000\t1700000000\ttrue\tcmd\t/path\t/dev/ttys001\ttrue\ttrue\ttrue\t1234\tTitle\tstart\t1\n",
         stderr: "",
         exitCode: 0,
       }),
@@ -77,7 +78,7 @@ describe("createInspector", () => {
     const adapter = {
       run: vi.fn().mockResolvedValue({
         stdout:
-          "bad line\n%1\tsession\t0\t1\t1700000000\t1\tcmd\t/path\t/dev/ttys001\t0\t1\t1\t1234\tTitle\tstart\t1\n",
+          "bad line\n%1\tsession\t0\t1\t1700000000\t1700000000\t1\tcmd\t/path\t/dev/ttys001\t0\t1\t1\t1234\tTitle\tstart\t1\n",
         stderr: "",
         exitCode: 0,
       }),

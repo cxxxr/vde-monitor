@@ -21,7 +21,7 @@ import {
   type TmuxAdapter,
 } from "@tmux-agent-monitor/tmux";
 
-import { shouldSuppressActivity } from "./activity-suppressor.js";
+import { resolveActivityTimestamp } from "./activity-resolver.js";
 import {
   createJsonlTailer,
   createLogActivityPoller,
@@ -153,17 +153,6 @@ const resolveRepoRootCached = async (cwd: string | null) => {
   const repoRoot = await resolveRepoRoot(normalized);
   repoRootCache.set(normalized, { repoRoot, at: nowMs });
   return repoRoot;
-};
-
-const toIsoFromEpochSeconds = (value: number | null) => {
-  if (!value) {
-    return null;
-  }
-  const date = new Date(value * 1000);
-  if (Number.isNaN(date.getTime())) {
-    return null;
-  }
-  return date.toISOString();
 };
 
 const getProcessCommand = async (pid: number | null) => {
@@ -490,9 +479,14 @@ export const createSessionMonitor = (adapter: TmuxAdapter, config: AgentMonitorC
         updateOutputAt(stat.mtime.toISOString());
       }
 
-      const windowActivityAt = toIsoFromEpochSeconds(pane.windowActivity);
-      if (windowActivityAt && !shouldSuppressActivity(pane.paneId, windowActivityAt)) {
-        updateOutputAt(windowActivityAt);
+      const activityAt = resolveActivityTimestamp({
+        paneId: pane.paneId,
+        paneActivity: pane.paneActivity,
+        windowActivity: pane.windowActivity,
+        paneActive: pane.paneActive,
+      });
+      if (activityAt) {
+        updateOutputAt(activityAt);
       }
 
       if (agent === "codex" && !pane.paneDead) {
