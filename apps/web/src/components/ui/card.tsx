@@ -2,13 +2,17 @@ import type { HTMLAttributes } from "react";
 
 import { cn } from "@/lib/cn";
 
-type CardProps = HTMLAttributes<HTMLDivElement>;
+type CardProps = HTMLAttributes<HTMLDivElement> & {
+  interactive?: boolean;
+};
 
-const Card = ({ className, ...props }: CardProps) => {
+const Card = ({ className, interactive = false, ...props }: CardProps) => {
   return (
     <div
       className={cn(
         "shadow-glass border-latte-surface1/60 bg-latte-base/80 rounded-3xl border p-4 backdrop-blur",
+        interactive &&
+          "hover:border-latte-lavender/40 cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.01] hover:shadow-xl active:translate-y-0 active:scale-[0.99]",
         className,
       )}
       {...props}

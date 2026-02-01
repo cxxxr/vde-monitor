@@ -1,4 +1,4 @@
-import { RefreshCw } from "lucide-react";
+import { MonitorX, RefreshCw, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -132,27 +132,37 @@ export const SessionListPage = () => {
   const groups = useMemo(() => buildSessionGroups(filtered), [filtered]);
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-10">
+    <div className="animate-fade-in-up mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-10">
       <div className="flex justify-end">
         <ThemeToggle />
       </div>
-      <header className="shadow-glass border-latte-surface1/60 bg-latte-base/80 flex flex-col gap-4 rounded-[32px] border p-6 backdrop-blur">
+      <header className="shadow-glass border-latte-surface1/60 bg-latte-base/80 animate-fade-in stagger-1 flex flex-col gap-4 rounded-[32px] border p-6 opacity-0 backdrop-blur">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-latte-subtext0 text-xs uppercase tracking-[0.5em]">
               tmux-agent-monitor
             </p>
-            <h1 className="font-display text-latte-text text-3xl">Live Sessions</h1>
+            <h1 className="font-display text-latte-text text-4xl font-semibold tracking-tight">
+              Live Sessions
+            </h1>
           </div>
           <div className="flex flex-col items-end gap-3">
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
+              <div
+                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
+                  connected
+                    ? "border-latte-green/40 bg-latte-green/10 text-latte-green"
+                    : "border-latte-red/40 bg-latte-red/10 text-latte-red animate-pulse"
+                }`}
+              >
                 <span
-                  className={`h-2 w-2 rounded-full ${connected ? "bg-latte-green" : "bg-latte-red"}`}
+                  className={`h-2 w-2 rounded-full ${
+                    connected
+                      ? "bg-latte-green shadow-[0_0_8px_rgb(var(--ctp-green)/0.6)]"
+                      : "bg-latte-red shadow-[0_0_8px_rgb(var(--ctp-red)/0.6)]"
+                  }`}
                 />
-                <span className="text-latte-subtext0 text-xs">
-                  {connected ? "Connected" : "Reconnecting"}
-                </span>
+                <span>{connected ? "Connected" : "Reconnecting..."}</span>
               </div>
               <Button
                 variant="ghost"
@@ -191,6 +201,40 @@ export const SessionListPage = () => {
       </header>
 
       <div className="flex flex-col gap-6">
+        {sessions.length === 0 && (
+          <Card className="flex flex-col items-center gap-4 py-16 text-center">
+            <div className="bg-latte-surface1/50 flex h-20 w-20 items-center justify-center rounded-full">
+              <MonitorX className="text-latte-overlay1 h-10 w-10" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="font-display text-latte-text text-xl">No Active Sessions</h2>
+              <p className="text-latte-subtext0 max-w-sm text-sm">
+                Start a tmux session with Codex or Claude Code to see it here. Sessions will appear
+                automatically when detected.
+              </p>
+            </div>
+            <Button variant="ghost" size="sm" onClick={refreshSessions} className="mt-2">
+              <RefreshCw className="h-4 w-4" />
+              Check Again
+            </Button>
+          </Card>
+        )}
+        {sessions.length > 0 && groups.length === 0 && (
+          <Card className="flex flex-col items-center gap-4 py-12 text-center">
+            <div className="bg-latte-surface1/50 flex h-16 w-16 items-center justify-center rounded-full">
+              <Search className="text-latte-overlay1 h-8 w-8" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="font-display text-latte-text text-lg">No Matching Sessions</h2>
+              <p className="text-latte-subtext0 text-sm">
+                No sessions match the selected filter. Try selecting a different status.
+              </p>
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => setFilter("ALL")} className="mt-2">
+              Show All Sessions
+            </Button>
+          </Card>
+        )}
         {groups.map((group) => {
           const groupTone = getLastInputTone(group.lastInputAt, nowMs);
           return (
@@ -236,7 +280,7 @@ export const SessionListPage = () => {
                         to={`/sessions/${encodeURIComponent(session.paneId)}`}
                         className="group"
                       >
-                        <Card className="hover:shadow-glow p-6 transition hover:-translate-y-1">
+                        <Card interactive className="p-6">
                           <div className="flex flex-col gap-2">
                             <div className="flex flex-wrap items-center justify-between gap-3">
                               <div className="flex flex-wrap items-center gap-2">
