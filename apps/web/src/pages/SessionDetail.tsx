@@ -875,8 +875,10 @@ export const SessionDetailPage = () => {
     if (mode !== "text") {
       return [];
     }
-    return renderAnsiLines(screen || "No screen data", resolvedTheme);
-  }, [mode, screen, resolvedTheme]);
+    return renderAnsiLines(screen || "No screen data", resolvedTheme, {
+      agent: session?.agent,
+    });
+  }, [mode, screen, resolvedTheme, session?.agent]);
   const commitPageSize = 10;
   const virtuosoRef = useRef<VirtuosoHandle>(null);
   const scrollToBottom = useCallback(

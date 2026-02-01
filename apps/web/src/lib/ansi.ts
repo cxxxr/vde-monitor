@@ -163,16 +163,119 @@ const ensureLineContent = (html: string): string => {
   return `${html}${placeholder}`;
 };
 
+type RenderAnsiOptions = {
+  agent?: "codex" | "claude" | "unknown";
+};
+
+const ansiEscapePattern = new RegExp(String.raw`\u001b\[[0-?]*[ -/]*[@-~]`, "g");
+const stripAnsi = (value: string) => value.replace(ansiEscapePattern, "");
+
+const escapeHtml = (value: string) =>
+  value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
+const lineNumberPattern = /^(\s*\d+)(\s+(?:[|:\u2502]\s*)?)(.*)$/;
+
+const parseLineNumberParts = (line: string) => {
+  const match = line.match(lineNumberPattern);
+  if (!match) return null;
+  return {
+    prefix: `${match[1] ?? ""}${match[2] ?? ""}`,
+    rest: match[3] ?? "",
+  };
+};
+
+const hasDiffMarker = (line: string) => {
+  const parsed = parseLineNumberParts(line);
+  if (!parsed) return false;
+  const restTrimmed = parsed.rest.trimStart();
+  return restTrimmed.startsWith("+") || restTrimmed.startsWith("-");
+};
+
+const isDiffCandidateLine = (line: string) => {
+  if (parseLineNumberParts(line)) return true;
+  const trimmed = line.trim();
+  return trimmed === "" || trimmed === "...";
+};
+
+const buildClaudeDiffMask = (lines: string[]) => {
+  const mask = new Array(lines.length).fill(false);
+  let segmentStart = -1;
+  const closeSegment = (end: number) => {
+    if (segmentStart < 0) return;
+    let include = false;
+    for (let i = segmentStart; i <= end; i += 1) {
+      if (hasDiffMarker(lines[i] ?? "")) {
+        include = true;
+        break;
+      }
+    }
+    if (include) {
+      for (let i = segmentStart; i <= end; i += 1) {
+        mask[i] = true;
+      }
+    }
+    segmentStart = -1;
+  };
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i] ?? "";
+    if (isDiffCandidateLine(line)) {
+      if (segmentStart === -1) {
+        segmentStart = i;
+      }
+      continue;
+    }
+    closeSegment(i - 1);
+  }
+  closeSegment(lines.length - 1);
+  return mask;
+};
+
+const renderClaudeDiffLine = (plainLine: string) => {
+  const parsed = parseLineNumberParts(plainLine);
+  if (!parsed) {
+    return `<span class="text-latte-text">${escapeHtml(plainLine)}</span>`;
+  }
+  const restTrimmed = parsed.rest.trimStart();
+  const restClass = restTrimmed.startsWith("+")
+    ? "text-latte-green"
+    : restTrimmed.startsWith("-")
+      ? "text-latte-red"
+      : "text-latte-text";
+  return `<span class="text-latte-text">${escapeHtml(parsed.prefix)}</span><span class="${restClass}">${escapeHtml(parsed.rest)}</span>`;
+};
+
 export const renderAnsi = (text: string, theme: Theme = "latte"): string => {
   const html = ansiToHtmlByTheme[theme].toHtml(text);
   return adjustLowContrast(html, theme);
 };
 
-export const renderAnsiLines = (text: string, theme: Theme = "latte"): string[] => {
+export const renderAnsiLines = (
+  text: string,
+  theme: Theme = "latte",
+  options?: RenderAnsiOptions,
+): string[] => {
   const converter = buildAnsiToHtml(theme, { stream: true });
   const normalized = text.replace(/\r\n/g, "\n");
-  return normalized.split("\n").map((line) => {
-    const html = converter.toHtml(line);
-    return ensureLineContent(adjustLowContrast(html, theme));
+  const lines = normalized.split("\n");
+  if (options?.agent !== "claude") {
+    return lines.map((line) => {
+      const html = converter.toHtml(line);
+      return ensureLineContent(adjustLowContrast(html, theme));
+    });
+  }
+  const plainLines = lines.map(stripAnsi);
+  const diffMask = buildClaudeDiffMask(plainLines);
+  return lines.map((line, index) => {
+    if (!diffMask[index]) {
+      const html = converter.toHtml(line);
+      return ensureLineContent(adjustLowContrast(html, theme));
+    }
+    const plainLine = plainLines[index] ?? "";
+    return ensureLineContent(renderClaudeDiffLine(plainLine));
   });
 };

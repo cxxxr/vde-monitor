@@ -1,0 +1,45 @@
+import { describe, expect, it } from "vitest";
+
+import { renderAnsiLines } from "./ansi";
+
+describe("renderAnsiLines", () => {
+  it("keeps default ANSI rendering for non-Claude agents", () => {
+    const lines = renderAnsiLines("  10 +foo", "latte", { agent: "codex" });
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).not.toContain("text-latte-green");
+    expect(lines[0]).not.toContain("text-latte-red");
+  });
+
+  it("formats Claude diff lines with plain classes", () => {
+    const text = ["Update(file)", "  10 +foo", "  11 -bar", "  12 baz"].join("\n");
+    const lines = renderAnsiLines(text, "latte", { agent: "claude" });
+    expect(lines[1]).toContain('class="text-latte-text"');
+    expect(lines[1]).toContain('class="text-latte-green"');
+    expect(lines[1]).toContain(">+foo<");
+    expect(lines[2]).toContain('class="text-latte-red"');
+    expect(lines[3]).toContain('class="text-latte-text"');
+  });
+
+  it("does not format line-number blocks without diff markers", () => {
+    const text = ["  1 foo", "  2 bar"].join("\n");
+    const lines = renderAnsiLines(text, "latte", { agent: "claude" });
+    expect(lines[0]).not.toContain("text-latte-green");
+    expect(lines[0]).not.toContain("text-latte-red");
+    expect(lines[1]).not.toContain("text-latte-green");
+    expect(lines[1]).not.toContain("text-latte-red");
+  });
+
+  it("strips ANSI codes and escapes HTML in Claude diff rendering", () => {
+    const text = "  10 +\u001b[31m<div>\u001b[0m";
+    const lines = renderAnsiLines(text, "latte", { agent: "claude" });
+    expect(lines[0]).toContain("&lt;div&gt;");
+    expect(lines[0]).not.toContain("\u001b");
+  });
+
+  it("keeps ellipsis lines within a diff segment as plain text", () => {
+    const text = ["  1 foo", "  2 -bar", "...", "  3 baz"].join("\n");
+    const lines = renderAnsiLines(text, "latte", { agent: "claude" });
+    expect(lines[2]).toContain("text-latte-text");
+    expect(lines[2]).toContain("...");
+  });
+});
