@@ -40,19 +40,29 @@ const catppuccinMochaAnsi: Record<number, string> = {
   15: "#cdd6f4",
 };
 
-const ansiToHtmlByTheme: Record<Theme, AnsiToHtml> = {
-  latte: new AnsiToHtml({
+const ansiConfigByTheme = {
+  latte: {
     fg: "#4c4f69",
-    bg: "transparent",
-    escapeXML: true,
     colors: catppuccinLatteAnsi,
-  }),
-  mocha: new AnsiToHtml({
+  },
+  mocha: {
     fg: "#cdd6f4",
+    colors: catppuccinMochaAnsi,
+  },
+} satisfies Record<Theme, { fg: string; colors: Record<number, string> }>;
+
+const buildAnsiToHtml = (theme: Theme, options?: { stream?: boolean }) =>
+  new AnsiToHtml({
+    fg: ansiConfigByTheme[theme].fg,
     bg: "transparent",
     escapeXML: true,
-    colors: catppuccinMochaAnsi,
-  }),
+    colors: ansiConfigByTheme[theme].colors,
+    ...options,
+  });
+
+const ansiToHtmlByTheme: Record<Theme, AnsiToHtml> = {
+  latte: buildAnsiToHtml("latte"),
+  mocha: buildAnsiToHtml("mocha"),
 };
 
 const fallbackByTheme: Record<Theme, { background: string; text: string }> = {
@@ -112,6 +122,9 @@ const adjustLowContrast = (html: string, theme: Theme): string => {
   if (typeof window === "undefined") {
     return html;
   }
+  if (!html.includes("background-color")) {
+    return html;
+  }
   const fallback = fallbackByTheme[theme];
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, "text/html");
@@ -135,7 +148,31 @@ const adjustLowContrast = (html: string, theme: Theme): string => {
   return doc.body.innerHTML;
 };
 
+const ensureLineContent = (html: string): string => {
+  const placeholder = "&#x200B;";
+  if (!html) {
+    return placeholder;
+  }
+  const text = html.replace(/<[^>]*>/g, "");
+  if (text.length > 0) {
+    return html;
+  }
+  if (html.includes("</")) {
+    return html.replace(/(<\/[^>]+>)+$/, `${placeholder}$1`);
+  }
+  return `${html}${placeholder}`;
+};
+
 export const renderAnsi = (text: string, theme: Theme = "latte"): string => {
   const html = ansiToHtmlByTheme[theme].toHtml(text);
   return adjustLowContrast(html, theme);
+};
+
+export const renderAnsiLines = (text: string, theme: Theme = "latte"): string[] => {
+  const converter = buildAnsiToHtml(theme, { stream: true });
+  const normalized = text.replace(/\r\n/g, "\n");
+  return normalized.split("\n").map((line) => {
+    const html = converter.toHtml(line);
+    return ensureLineContent(adjustLowContrast(html, theme));
+  });
 };

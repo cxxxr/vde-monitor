@@ -24,6 +24,8 @@ import {
   X,
 } from "lucide-react";
 import {
+  forwardRef,
+  type HTMLAttributes,
   memo,
   type ReactNode,
   startTransition,
@@ -36,14 +38,14 @@ import {
   useState,
 } from "react";
 import { Link, useParams } from "react-router-dom";
-import { useStickToBottom } from "use-stick-to-bottom";
+import { Virtuoso, type VirtuosoHandle } from "react-virtuoso";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { renderAnsi } from "@/lib/ansi";
+import { renderAnsiLines } from "@/lib/ansi";
 import {
   initialScreenLoadingState,
   screenLoadingReducer,
@@ -247,6 +249,30 @@ const KeyButton = ({
   </Button>
 );
 
+const VirtuosoScroller = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      {...props}
+      className={`custom-scrollbar w-full min-w-0 max-w-full overflow-x-auto overflow-y-auto rounded-2xl ${className ?? ""}`}
+    />
+  ),
+);
+
+VirtuosoScroller.displayName = "VirtuosoScroller";
+
+const VirtuosoList = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      {...props}
+      className={`text-latte-text w-max min-w-max px-3 py-3 font-mono text-xs ${className ?? ""}`}
+    />
+  ),
+);
+
+VirtuosoList.displayName = "VirtuosoList";
+
 type DiffSectionProps = {
   diffSummary: DiffSummary | null;
   diffError: string | null;
@@ -265,10 +291,10 @@ const DiffSection = memo(
     diffLoading,
     diffFiles,
     diffOpen,
-  diffLoadingFiles,
-  onRefresh,
-  onToggle,
-}: DiffSectionProps) => {
+    diffLoadingFiles,
+    onRefresh,
+    onToggle,
+  }: DiffSectionProps) => {
     const [expandedDiffs, setExpandedDiffs] = useState<Record<string, boolean>>({});
 
     useEffect(() => {
@@ -323,7 +349,7 @@ const DiffSection = memo(
           nodes: visibleLines.map((line, index) => (
             <div
               key={`${index}-${line.slice(0, 12)}`}
-              className={`${diffLineClass(line)} -mx-2 rounded-sm px-2`}
+              className={`${diffLineClass(line)} -mx-2 block w-full rounded-sm px-2`}
             >
               {line || " "}
             </div>
@@ -445,9 +471,9 @@ const DiffSection = memo(
                     )}
                     {!loadingFile && !fileData?.binary && fileData?.patch && (
                       <div className="custom-scrollbar max-h-[360px] overflow-auto">
-                        <pre className="whitespace-pre pl-4 font-mono text-xs">
+                        <div className="text-latte-text w-max min-w-full whitespace-pre pl-4 font-mono text-xs">
                           {renderedPatch?.nodes}
-                        </pre>
+                        </div>
                         {renderedPatch?.truncated && (
                           <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
                             <span className="text-latte-subtext0">
@@ -536,7 +562,7 @@ const CommitSection = memo(
         next[key] = file.patch.split("\n").map((line, index) => (
           <div
             key={`${index}-${line.slice(0, 12)}`}
-            className={`${diffLineClass(line)} -mx-2 rounded-sm px-2`}
+            className={`${diffLineClass(line)} -mx-2 block w-full rounded-sm px-2`}
           >
             {line || " "}
           </div>
@@ -722,9 +748,9 @@ const CommitSection = memo(
                                   )}
                                   {!loadingFile && !fileDetail?.binary && fileDetail?.patch && (
                                     <div className="custom-scrollbar max-h-[240px] overflow-auto">
-                                      <pre className="whitespace-pre pl-4 font-mono text-xs">
+                                      <div className="text-latte-text w-max min-w-full whitespace-pre pl-4 font-mono text-xs">
                                         {renderedPatch}
-                                      </pre>
+                                      </div>
                                       {fileDetail.truncated && (
                                         <p className="text-latte-subtext0 mt-2 text-xs">
                                           Diff truncated.
@@ -845,27 +871,26 @@ export const SessionDetailPage = () => {
     const timer = window.setInterval(() => setNowMs(Date.now()), 60_000);
     return () => window.clearInterval(timer);
   }, []);
-  const renderedScreen = useMemo(
-    () => renderAnsi(screen || "No screen data", resolvedTheme),
-    [screen, resolvedTheme],
-  );
+  const screenLines = useMemo(() => {
+    if (mode !== "text") {
+      return [];
+    }
+    return renderAnsiLines(screen || "No screen data", resolvedTheme);
+  }, [mode, screen, resolvedTheme]);
   const commitPageSize = 10;
-  const { scrollRef, contentRef, scrollToBottom } = useStickToBottom({
-    initial: "instant",
-    resize: "instant",
-  });
+  const virtuosoRef = useRef<VirtuosoHandle>(null);
+  const scrollToBottom = useCallback(
+    (behavior: "auto" | "smooth" = "auto") => {
+      if (!virtuosoRef.current || screenLines.length === 0) return;
+      const index = screenLines.length - 1;
+      virtuosoRef.current.scrollToIndex({ index, align: "end", behavior });
+    },
+    [screenLines.length],
+  );
   const [isAtBottom, setIsAtBottom] = useState(true);
   const prevModeRef = useRef<ScreenMode>(mode);
   const snapToBottomRef = useRef(false);
   const isScreenLoading = screenLoadingState.loading && screenLoadingState.mode === mode;
-  const updateScrollState = useCallback(() => {
-    const scrollEl = scrollRef.current;
-    if (!scrollEl) {
-      return;
-    }
-    const distanceFromBottom = scrollEl.scrollHeight - scrollEl.scrollTop - scrollEl.clientHeight;
-    setIsAtBottom(distanceFromBottom <= 8);
-  }, [scrollRef]);
 
   useEffect(() => {
     const prevMode = prevModeRef.current;
@@ -879,43 +904,15 @@ export const SessionDetailPage = () => {
     if (!snapToBottomRef.current || mode !== "text") {
       return;
     }
-    void scrollToBottom({ animation: "instant", ignoreEscapes: true });
+    scrollToBottom("auto");
     snapToBottomRef.current = false;
-  }, [mode, screen, renderedScreen, scrollToBottom]);
-
-  useLayoutEffect(() => {
-    if (mode !== "text") {
-      setIsAtBottom(true);
-      return;
-    }
-    const scrollEl = scrollRef.current;
-    if (!scrollEl) {
-      return;
-    }
-    const distanceFromBottom = scrollEl.scrollHeight - scrollEl.scrollTop - scrollEl.clientHeight;
-    if (distanceFromBottom <= 8) {
-      void scrollToBottom({ animation: "instant" });
-    }
-    setIsAtBottom(distanceFromBottom <= 8);
-  }, [mode, renderedScreen, scrollRef, scrollToBottom]);
+  }, [mode, screenLines.length, scrollToBottom]);
 
   useEffect(() => {
     if (mode !== "text") {
-      return;
+      setIsAtBottom(true);
     }
-    const scrollEl = scrollRef.current;
-    if (!scrollEl) {
-      return;
-    }
-    const handleScroll = () => updateScrollState();
-    scrollEl.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll);
-    updateScrollState();
-    return () => {
-      scrollEl.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
-    };
-  }, [mode, scrollRef, updateScrollState]);
+  }, [mode]);
 
   const refreshScreen = useCallback(async () => {
     if (!paneId) return;
@@ -1479,7 +1476,7 @@ export const SessionDetailPage = () => {
       textInputRef.current.value = "";
     }
     if (mode === "text") {
-      void scrollToBottom({ animation: "instant", ignoreEscapes: true });
+      scrollToBottom("auto");
     }
   };
 
@@ -1771,22 +1768,26 @@ export const SessionDetailPage = () => {
               </div>
             ) : (
               <>
-                <div
-                  ref={scrollRef}
-                  className="custom-scrollbar w-full min-w-0 max-w-full overflow-x-auto overflow-y-auto rounded-2xl"
-                  style={{ maxHeight: "60vh" }}
-                >
-                  <div ref={contentRef} className="p-3">
-                    <pre
-                      className="text-latte-text w-max whitespace-pre font-mono text-xs"
-                      dangerouslySetInnerHTML={{ __html: renderedScreen }}
+                <Virtuoso
+                  ref={virtuosoRef}
+                  data={screenLines}
+                  initialTopMostItemIndex={Math.max(screenLines.length - 1, 0)}
+                  followOutput="auto"
+                  atBottomStateChange={setIsAtBottom}
+                  components={{ Scroller: VirtuosoScroller, List: VirtuosoList }}
+                  className="w-full min-w-0 max-w-full"
+                  style={{ height: "60vh" }}
+                  itemContent={(_index, line) => (
+                    <div
+                      className="min-h-4 whitespace-pre leading-4"
+                      dangerouslySetInnerHTML={{ __html: line || "&#x200B;" }}
                     />
-                  </div>
-                </div>
+                  )}
+                />
                 {!isAtBottom && (
                   <button
                     type="button"
-                    onClick={() => scrollToBottom({ animation: "smooth", ignoreEscapes: true })}
+                    onClick={() => scrollToBottom("smooth")}
                     aria-label="Scroll to bottom"
                     className="border-latte-surface2 bg-latte-base/80 text-latte-text hover:border-latte-lavender/60 hover:text-latte-lavender focus-visible:ring-latte-lavender absolute bottom-2 right-2 inline-flex h-8 w-8 items-center justify-center rounded-full border shadow-md backdrop-blur transition focus-visible:outline-none focus-visible:ring-2"
                   >
