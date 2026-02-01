@@ -1,7 +1,13 @@
 // @vitest-environment happy-dom
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRoute,
+  createRouter,
+  RouterContextProvider,
+} from "@tanstack/react-router";
 import { fireEvent, render, screen } from "@testing-library/react";
-import type { PropsWithChildren } from "react";
-import { MemoryRouter } from "react-router-dom";
+import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { ThemeProvider } from "@/state/theme-context";
@@ -10,15 +16,29 @@ import { createSessionDetail } from "../test-helpers";
 import { SessionHeader } from "./SessionHeader";
 
 describe("SessionHeader", () => {
-  const Wrapper = ({ children }: PropsWithChildren) => (
-    <ThemeProvider>
-      <MemoryRouter>{children}</MemoryRouter>
-    </ThemeProvider>
-  );
+  const renderWithRouter = (ui: ReactNode) => {
+    const rootRoute = createRootRoute({
+      component: () => null,
+    });
+    const indexRoute = createRoute({
+      getParentRoute: () => rootRoute,
+      path: "/",
+      component: () => null,
+    });
+    const router = createRouter({
+      routeTree: rootRoute.addChildren([indexRoute]),
+      history: createMemoryHistory({ initialEntries: ["/"] }),
+    });
+    return render(
+      <RouterContextProvider router={router}>
+        <ThemeProvider>{ui}</ThemeProvider>
+      </RouterContextProvider>,
+    );
+  };
 
   it("renders session title and metadata", () => {
     const session = createSessionDetail({ customTitle: "Custom Title" });
-    render(
+    renderWithRouter(
       <SessionHeader
         session={session}
         readOnly={false}
@@ -34,7 +54,6 @@ describe("SessionHeader", () => {
         onOpenTitleEditor={vi.fn()}
         onCloseTitleEditor={vi.fn()}
       />,
-      { wrapper: Wrapper },
     );
 
     const titleButton = screen.getByRole("button", { name: "Edit session title" });
@@ -51,7 +70,7 @@ describe("SessionHeader", () => {
     const onTitleSave = vi.fn();
     const onCloseTitleEditor = vi.fn();
 
-    render(
+    renderWithRouter(
       <SessionHeader
         session={session}
         readOnly={false}
@@ -67,7 +86,6 @@ describe("SessionHeader", () => {
         onOpenTitleEditor={vi.fn()}
         onCloseTitleEditor={onCloseTitleEditor}
       />,
-      { wrapper: Wrapper },
     );
 
     const input = screen.getByLabelText("Custom session title");
@@ -84,7 +102,7 @@ describe("SessionHeader", () => {
   it("disables title editing when read-only", () => {
     const session = createSessionDetail({ customTitle: "Custom Title" });
     const onOpenTitleEditor = vi.fn();
-    render(
+    renderWithRouter(
       <SessionHeader
         session={session}
         readOnly
@@ -100,7 +118,6 @@ describe("SessionHeader", () => {
         onOpenTitleEditor={onOpenTitleEditor}
         onCloseTitleEditor={vi.fn()}
       />,
-      { wrapper: Wrapper },
     );
 
     const titleButton = screen.getByRole("button", { name: "Edit session title" });
@@ -111,7 +128,7 @@ describe("SessionHeader", () => {
 
   it("renders alerts when read-only, pipe conflict, or connection issue", () => {
     const session = createSessionDetail({ pipeConflict: true });
-    render(
+    renderWithRouter(
       <SessionHeader
         session={session}
         readOnly
@@ -127,7 +144,6 @@ describe("SessionHeader", () => {
         onOpenTitleEditor={vi.fn()}
         onCloseTitleEditor={vi.fn()}
       />,
-      { wrapper: Wrapper },
     );
 
     expect(screen.getByText("Read-only mode is active. Actions are disabled.")).toBeTruthy();

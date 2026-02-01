@@ -1,6 +1,6 @@
+import { Link } from "@tanstack/react-router";
 import type { SessionDetail } from "@tmux-agent-monitor/shared";
 import { ArrowLeft, X } from "lucide-react";
-import { Link } from "react-router-dom";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge } from "@/components/ui/badge";

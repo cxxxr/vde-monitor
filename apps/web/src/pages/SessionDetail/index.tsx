@@ -1,7 +1,7 @@
+import { Link, useNavigate, useParams } from "@tanstack/react-router";
 import { defaultDangerKeys } from "@tmux-agent-monitor/shared";
 import { ArrowLeft } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { Card } from "@/components/ui/card";
 import { buildSessionGroups } from "@/lib/session-group";
@@ -23,8 +23,7 @@ import { useSessionTitleEditor } from "./hooks/useSessionTitleEditor";
 import { backLinkClass, isDangerousText } from "./sessionDetailUtils";
 
 export const SessionDetailPage = () => {
-  const { paneId: paneIdEncoded } = useParams();
-  const paneId = paneIdEncoded ?? "";
+  const { paneId } = useParams({ from: "/sessions/$paneId" });
   const {
     sessions,
     connected,
@@ -237,9 +236,8 @@ export const SessionDetailPage = () => {
 
   const handleOpenHere = useCallback(() => {
     if (!selectedPaneId) return;
-    const encoded = encodeURIComponent(selectedPaneId);
     closeQuickPanel();
-    navigate(`/sessions/${encoded}`);
+    navigate({ to: "/sessions/$paneId", params: { paneId: selectedPaneId } });
     closeLogModal();
   }, [closeLogModal, closeQuickPanel, navigate, selectedPaneId]);
 

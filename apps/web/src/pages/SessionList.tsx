@@ -1,6 +1,6 @@
+import { Link } from "@tanstack/react-router";
 import { MonitorX, RefreshCw, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge } from "@/components/ui/badge";
@@ -277,7 +277,8 @@ export const SessionListPage = () => {
                     return (
                       <Link
                         key={session.paneId}
-                        to={`/sessions/${encodeURIComponent(session.paneId)}`}
+                        to="/sessions/$paneId"
+                        params={{ paneId: session.paneId }}
                         className="group"
                       >
                         <Card interactive className="p-6">
