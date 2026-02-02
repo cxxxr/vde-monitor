@@ -1,10 +1,10 @@
 import { Link, useNavigate, useParams } from "@tanstack/react-router";
-import { defaultDangerKeys } from "@tmux-agent-monitor/shared";
 import { ArrowLeft } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo } from "react";
 
 import { Card } from "@/components/ui";
 import { buildSessionGroups } from "@/lib/session-group";
+import { useNowMs } from "@/lib/use-now-ms";
 import { useSessions } from "@/state/session-context";
 import { useTheme } from "@/state/theme-context";
 
@@ -16,11 +16,12 @@ import { QuickPanel } from "./components/QuickPanel";
 import { ScreenPanel } from "./components/ScreenPanel";
 import { SessionHeader } from "./components/SessionHeader";
 import { useSessionCommits } from "./hooks/useSessionCommits";
+import { useSessionControls } from "./hooks/useSessionControls";
 import { useSessionDiffs } from "./hooks/useSessionDiffs";
 import { useSessionLogs } from "./hooks/useSessionLogs";
 import { useSessionScreen } from "./hooks/useSessionScreen";
 import { useSessionTitleEditor } from "./hooks/useSessionTitleEditor";
-import { backLinkClass, isDangerousText } from "./sessionDetailUtils";
+import { backLinkClass } from "./sessionDetailUtils";
 
 export const SessionDetailPage = () => {
   const { paneId } = useParams({ from: "/sessions/$paneId" });
@@ -44,12 +45,7 @@ export const SessionDetailPage = () => {
   const { resolvedTheme } = useTheme();
   const session = getSessionDetail(paneId);
   const navigate = useNavigate();
-  const [nowMs, setNowMs] = useState(() => Date.now());
-  const textInputRef = useRef<HTMLTextAreaElement | null>(null);
-  const [autoEnter, setAutoEnter] = useState(true);
-  const [shiftHeld, setShiftHeld] = useState(false);
-  const [ctrlHeld, setCtrlHeld] = useState(false);
-  const [controlsOpen, setControlsOpen] = useState(false);
+  const nowMs = useNowMs();
 
   const {
     mode,
@@ -72,6 +68,28 @@ export const SessionDetailPage = () => {
     requestScreen,
     resolvedTheme,
     agent: session?.agent,
+  });
+
+  const {
+    textInputRef,
+    autoEnter,
+    shiftHeld,
+    ctrlHeld,
+    controlsOpen,
+    handleSendKey,
+    handleSendText,
+    toggleAutoEnter,
+    toggleControls,
+    toggleShift,
+    toggleCtrl,
+  } = useSessionControls({
+    paneId,
+    readOnly,
+    mode,
+    sendText,
+    sendKeys,
+    setScreenError,
+    scrollToBottom,
   });
 
   const {
@@ -153,72 +171,7 @@ export const SessionDetailPage = () => {
     updateSessionTitle,
   });
 
-  useEffect(() => {
-    const timer = window.setInterval(() => setNowMs(Date.now()), 60_000);
-    return () => window.clearInterval(timer);
-  }, []);
-
   const sessionGroups = useMemo(() => buildSessionGroups(sessions), [sessions]);
-
-  const mapKeyWithModifiers = useCallback(
-    (key: string) => {
-      if (shiftHeld && key === "Tab") {
-        return "BTab";
-      }
-      if (ctrlHeld) {
-        const ctrlMap: Record<string, string> = {
-          Left: "C-Left",
-          Right: "C-Right",
-          Up: "C-Up",
-          Down: "C-Down",
-          Tab: "C-Tab",
-          Enter: "C-Enter",
-          Escape: "C-Escape",
-          BTab: "C-BTab",
-        };
-        if (ctrlMap[key]) {
-          return ctrlMap[key];
-        }
-      }
-      return key;
-    },
-    [ctrlHeld, shiftHeld],
-  );
-
-  const handleSendKey = async (key: string) => {
-    if (readOnly) return;
-    const mapped = mapKeyWithModifiers(key);
-    const hasDanger = defaultDangerKeys.includes(mapped);
-    if (hasDanger) {
-      const confirmed = window.confirm("Dangerous key detected. Send anyway?");
-      if (!confirmed) return;
-    }
-    const result = await sendKeys(paneId, [mapped]);
-    if (!result.ok) {
-      setScreenError(result.error?.message ?? "Failed to send keys");
-    }
-  };
-
-  const handleSendText = async () => {
-    if (readOnly) return;
-    const currentValue = textInputRef.current?.value ?? "";
-    if (!currentValue.trim()) return;
-    if (isDangerousText(currentValue)) {
-      const confirmed = window.confirm("Dangerous command detected. Send anyway?");
-      if (!confirmed) return;
-    }
-    const result = await sendText(paneId, currentValue, autoEnter);
-    if (!result.ok) {
-      setScreenError(result.error?.message ?? "Failed to send text");
-      return;
-    }
-    if (textInputRef.current) {
-      textInputRef.current.value = "";
-    }
-    if (mode === "text") {
-      scrollToBottom("auto");
-    }
-  };
 
   const handleRefreshScreen = useCallback(() => {
     if (connected) {
@@ -296,13 +249,13 @@ export const SessionDetailPage = () => {
                 textInputRef={textInputRef}
                 onSendText={handleSendText}
                 autoEnter={autoEnter}
-                onToggleAutoEnter={() => setAutoEnter((prev) => !prev)}
+                onToggleAutoEnter={toggleAutoEnter}
                 controlsOpen={controlsOpen}
-                onToggleControls={() => setControlsOpen((prev) => !prev)}
+                onToggleControls={toggleControls}
                 shiftHeld={shiftHeld}
-                onToggleShift={() => setShiftHeld((prev) => !prev)}
+                onToggleShift={toggleShift}
                 ctrlHeld={ctrlHeld}
-                onToggleCtrl={() => setCtrlHeld((prev) => !prev)}
+                onToggleCtrl={toggleCtrl}
                 onSendKey={handleSendKey}
               />
             }
