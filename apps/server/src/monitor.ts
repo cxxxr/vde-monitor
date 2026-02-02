@@ -91,13 +91,24 @@ const processSnapshotCache = {
 
 const normalizeTty = (tty: string) => tty.replace(/^\/dev\//, "");
 
-const normalizeFingerprint = (text: string) =>
-  text
+const fingerprintLineCount = 20;
+
+const normalizeFingerprint = (text: string, maxLines = fingerprintLineCount) => {
+  const normalized = text
     .replace(/\r/g, "")
     .split("\n")
     .map((line) => line.replace(/\s+$/, ""))
     .join("\n")
     .trimEnd();
+  if (maxLines <= 0) {
+    return normalized;
+  }
+  const lines = normalized.split("\n");
+  if (lines.length <= maxLines) {
+    return normalized;
+  }
+  return lines.slice(-maxLines).join("\n");
+};
 
 const normalizeTitle = (value: string | null | undefined) => {
   if (!value) return null;
@@ -368,7 +379,7 @@ export const createSessionMonitor = (adapter: TmuxAdapter, config: AgentMonitorC
   };
 
   const capturePaneFingerprint = async (paneId: string, useAlt: boolean) => {
-    const args = ["capture-pane", "-p", "-t", paneId, "-S", "-20", "-E", "-1"];
+    const args = ["capture-pane", "-p", "-e", "-t", paneId];
     if (useAlt) {
       args.push("-a");
     }
@@ -456,7 +467,7 @@ export const createSessionMonitor = (adapter: TmuxAdapter, config: AgentMonitorC
         config.logs.retainRotations,
       );
 
-      const hookState = hookStates.get(pane.paneId) ?? null;
+      let hookState = hookStates.get(pane.paneId) ?? null;
       let outputAt = lastOutputAt.get(pane.paneId) ?? null;
       const updateOutputAt = (next: string | null) => {
         if (!next) {
@@ -505,6 +516,14 @@ export const createSessionMonitor = (adapter: TmuxAdapter, config: AgentMonitorC
           Date.now() - config.activity.inactiveThresholdMs - 1000,
         ).toISOString();
         updateOutputAt(fallbackTs);
+      }
+      if (hookState && outputAt) {
+        const hookTs = Date.parse(hookState.at);
+        const outputTs = Date.parse(outputAt);
+        if (!Number.isNaN(hookTs) && !Number.isNaN(outputTs) && outputTs > hookTs) {
+          hookStates.delete(pane.paneId);
+          hookState = null;
+        }
       }
       const eventAt = lastEventAt.get(pane.paneId) ?? null;
       const message = lastMessage.get(pane.paneId) ?? null;
