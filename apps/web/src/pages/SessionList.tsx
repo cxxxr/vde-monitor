@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { MonitorX, RefreshCw, Search } from "lucide-react";
+import { Clock, MonitorX, RefreshCw, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -149,9 +149,11 @@ export const SessionListPage = () => {
                   <TagPill tone="neutral">{group.sessions.length} sessions</TagPill>
                   <LastInputPill
                     tone={groupTone}
-                    label="Latest input"
+                    label={<Clock className="h-3 w-3" />}
+                    srLabel="Latest input"
                     value={formatRelativeTime(group.lastInputAt, nowMs)}
                     size="md"
+                    showDot={false}
                   />
                 </div>
               </GlassPanel>
@@ -170,20 +172,20 @@ export const SessionListPage = () => {
                           <Toolbar className="gap-3">
                             <div className="flex flex-wrap items-center gap-2">
                               <Badge tone={stateTone(session.state)}>{session.state}</Badge>
+                              <Badge tone={agentToneFor(session.agent)}>
+                                {agentLabelFor(session.agent)}
+                              </Badge>
+                              <LastInputPill
+                                tone={sessionTone}
+                                label={<Clock className="h-3 w-3" />}
+                                srLabel="Last input"
+                                value={formatRelativeTime(session.lastInputAt, nowMs)}
+                                size="sm"
+                                showDot={false}
+                              />
                             </div>
                             {session.pipeConflict && <TagPill tone="danger">Pipe conflict</TagPill>}
                           </Toolbar>
-                          <div className="flex flex-wrap items-center gap-2">
-                            <Badge tone={agentToneFor(session.agent)}>
-                              {agentLabelFor(session.agent)}
-                            </Badge>
-                            <LastInputPill
-                              tone={sessionTone}
-                              label="Last input"
-                              value={formatRelativeTime(session.lastInputAt, nowMs)}
-                              size="sm"
-                            />
-                          </div>
                         </div>
                         <div className="mt-4 space-y-3">
                           <h3 className="font-display text-latte-text text-lg">

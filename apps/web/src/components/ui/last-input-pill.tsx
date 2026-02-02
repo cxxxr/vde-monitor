@@ -1,4 +1,4 @@
-import type { HTMLAttributes } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 
 import { cn } from "@/lib/cn";
 
@@ -15,19 +15,27 @@ const sizeClass = {
 
 type LastInputPillProps = HTMLAttributes<HTMLSpanElement> & {
   tone: LastInputTone;
-  label: string;
+  label: ReactNode;
+  srLabel?: string;
   value: string;
   size?: keyof typeof sizeClass;
+  showDot?: boolean;
 };
 
 const LastInputPill = ({
   className,
   tone,
   label,
+  srLabel,
   value,
   size = "sm",
+  showDot = true,
   ...props
 }: LastInputPillProps) => {
+  const labelClass =
+    typeof label === "string"
+      ? "text-[9px] uppercase tracking-[0.2em]"
+      : "text-[10px] leading-none";
   return (
     <span
       className={cn(
@@ -38,8 +46,11 @@ const LastInputPill = ({
       )}
       {...props}
     >
-      <span className={cn("h-1.5 w-1.5 rounded-full", tone.dot)} />
-      <span className="text-[9px] uppercase tracking-[0.2em]">{label}</span>
+      {showDot && <span className={cn("h-1.5 w-1.5 rounded-full", tone.dot)} />}
+      <span className={labelClass} aria-hidden={srLabel ? true : undefined}>
+        {label}
+      </span>
+      {srLabel && <span className="sr-only">{srLabel}</span>}
       <span>{value}</span>
     </span>
   );

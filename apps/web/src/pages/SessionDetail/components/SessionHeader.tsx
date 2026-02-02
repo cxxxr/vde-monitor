@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { SessionDetail } from "@tmux-agent-monitor/shared";
-import { ArrowLeft, X } from "lucide-react";
+import { ArrowLeft, Clock, X } from "lucide-react";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge, Callout, IconButton, LastInputPill, TagPill, TextButton } from "@/components/ui";
@@ -125,24 +125,26 @@ export const SessionHeader = ({
             </div>
             <div className="space-y-4">
               <p className="text-latte-subtext0 text-sm">{formatPath(session.currentPath)}</p>
-              <div className="text-latte-overlay1 flex flex-wrap items-center gap-2 text-[11px] font-semibold">
-                <TagPill tone="meta">Session {session.sessionName}</TagPill>
-                <TagPill tone="meta">Window {session.windowIndex}</TagPill>
-                <TagPill tone="meta">Pane {session.paneId}</TagPill>
-              </div>
             </div>
             {titleError && <p className="text-latte-red text-xs">{titleError}</p>}
           </div>
           <div className="flex flex-col items-start gap-2 sm:items-end">
-            <Badge tone={stateTone(session.state)}>{session.state}</Badge>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+              <Badge tone={stateTone(session.state)}>{session.state}</Badge>
               <Badge tone={agentTone}>{agentLabel}</Badge>
               <LastInputPill
                 tone={lastInputTone}
-                label="Last input"
+                label={<Clock className="h-3 w-3" />}
+                srLabel="Last input"
                 value={formatRelativeTime(session.lastInputAt, nowMs)}
                 size="sm"
+                showDot={false}
               />
+            </div>
+            <div className="text-latte-overlay1 flex flex-wrap items-center gap-2 text-[11px] font-semibold">
+              <TagPill tone="meta">Session {session.sessionName}</TagPill>
+              <TagPill tone="meta">Window {session.windowIndex}</TagPill>
+              <TagPill tone="meta">Pane {session.paneId}</TagPill>
             </div>
           </div>
         </div>

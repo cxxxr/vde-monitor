@@ -1,6 +1,6 @@
-import { List, X } from "lucide-react";
+import { Clock, List, X } from "lucide-react";
 
-import { Card, IconButton, LastInputPill, SurfaceButton, Toolbar } from "@/components/ui";
+import { Card, IconButton, LastInputPill, SurfaceButton } from "@/components/ui";
 import { agentIconMeta, formatRepoDirLabel, statusIconMeta } from "@/lib/quick-panel-utils";
 import type { SessionGroup } from "@/lib/session-group";
 
@@ -10,6 +10,7 @@ type QuickPanelProps = {
   open: boolean;
   sessionGroups: SessionGroup[];
   nowMs: number;
+  currentPaneId?: string | null;
   onOpenLogModal: (paneId: string) => void;
   onClose: () => void;
   onToggle: () => void;
@@ -19,6 +20,7 @@ export const QuickPanel = ({
   open,
   sessionGroups,
   nowMs,
+  currentPaneId,
   onOpenLogModal,
   onClose,
   onToggle,
@@ -57,37 +59,49 @@ export const QuickPanel = ({
                       const agentMeta = agentIconMeta(item.agent);
                       const StatusIcon = statusMeta.icon;
                       const AgentIcon = agentMeta.icon;
+                      const isCurrent = currentPaneId === item.paneId;
                       return (
                         <SurfaceButton
                           key={item.paneId}
                           type="button"
                           onClick={() => onOpenLogModal(item.paneId)}
+                          aria-current={isCurrent ? "true" : undefined}
+                          className={`flex flex-col gap-2 ${
+                            isCurrent
+                              ? "border-latte-lavender/70 bg-latte-lavender/10 shadow-[0_0_0_1px_rgba(114,135,253,0.35),0_10px_20px_-12px_rgba(114,135,253,0.35)]"
+                              : ""
+                          }`}
                         >
-                          <Toolbar>
-                            <div className="flex min-w-0 items-center gap-2">
-                              <span
-                                className={`inline-flex h-6 w-6 items-center justify-center rounded-full border ${statusMeta.wrap}`}
-                                aria-label={statusMeta.label}
-                              >
-                                <StatusIcon className={`h-3.5 w-3.5 ${statusMeta.className}`} />
+                          <div className="flex min-w-0 items-center gap-2">
+                            <span
+                              className={`inline-flex h-6 w-6 items-center justify-center rounded-full border ${statusMeta.wrap}`}
+                              aria-label={statusMeta.label}
+                            >
+                              <StatusIcon className={`h-3.5 w-3.5 ${statusMeta.className}`} />
+                            </span>
+                            <span className="text-latte-text min-w-0 truncate text-sm font-semibold">
+                              {displayTitle}
+                            </span>
+                          </div>
+                          <div className="text-latte-subtext0 flex flex-wrap items-center gap-2 text-[10px] font-semibold">
+                            <span
+                              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 ${agentMeta.wrap}`}
+                              aria-label={agentMeta.label}
+                            >
+                              <AgentIcon className={`h-3.5 w-3.5 ${agentMeta.className}`} />
+                              <span className="text-[9px] uppercase tracking-[0.2em]">
+                                {agentMeta.label}
                               </span>
-                              <span
-                                className={`inline-flex h-6 w-6 items-center justify-center rounded-full border ${agentMeta.wrap}`}
-                                aria-label={agentMeta.label}
-                              >
-                                <AgentIcon className={`h-3.5 w-3.5 ${agentMeta.className}`} />
-                              </span>
-                              <span className="text-latte-text text-sm font-semibold">
-                                {displayTitle}
-                              </span>
-                            </div>
+                            </span>
                             <LastInputPill
                               tone={lastInputTone}
-                              label="Last"
+                              label={<Clock className="h-3 w-3" />}
+                              srLabel="Last input"
                               value={formatRelativeTime(item.lastInputAt, nowMs)}
                               size="xs"
+                              showDot={false}
                             />
-                          </Toolbar>
+                          </div>
                         </SurfaceButton>
                       );
                     })}

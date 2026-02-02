@@ -298,6 +298,7 @@ export const SessionDetailPage = () => {
         open={quickPanelOpen}
         sessionGroups={sessionGroups}
         nowMs={nowMs}
+        currentPaneId={paneId}
         onOpenLogModal={openLogModal}
         onClose={closeQuickPanel}
         onToggle={toggleQuickPanel}
