@@ -1,6 +1,6 @@
 import { Laptop, Moon, Sun } from "lucide-react";
 
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui";
 import { isThemePreference } from "@/lib/theme";
 import { useTheme } from "@/state/theme-context";
 

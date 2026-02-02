@@ -3,8 +3,7 @@ import { ArrowDown, CornerDownLeft, ExternalLink, X } from "lucide-react";
 import { forwardRef, type HTMLAttributes, useEffect, useRef, useState } from "react";
 import { Virtuoso, type VirtuosoHandle } from "react-virtuoso";
 
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Button, Callout, Card, IconButton, LoadingOverlay, Toolbar } from "@/components/ui";
 
 type LogModalProps = {
   open: boolean;
@@ -81,15 +80,17 @@ export const LogModal = ({
   return (
     <div className="fixed bottom-24 left-6 z-50 w-[calc(100vw-3rem)] max-w-[480px] translate-x-1 translate-y-1">
       <Card className="font-body animate-panel-enter border-latte-lavender/30 bg-latte-mantle/85 relative rounded-[28px] border-2 p-4 shadow-[0_25px_80px_-20px_rgba(114,135,253,0.4),0_0_0_1px_rgba(114,135,253,0.15)] ring-1 ring-inset ring-white/10 backdrop-blur-xl">
-        <button
+        <IconButton
           type="button"
           onClick={onClose}
-          className="border-latte-lavender/40 bg-latte-lavender/10 text-latte-lavender hover:border-latte-lavender/60 hover:bg-latte-lavender/20 absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full border backdrop-blur transition"
+          className="absolute right-3 top-3"
+          variant="lavender"
+          size="sm"
           aria-label="Close log"
         >
           <X className="h-4 w-4" />
-        </button>
-        <div className="flex flex-wrap items-center justify-between gap-3 pr-12">
+        </IconButton>
+        <Toolbar className="gap-3 pr-12">
           <div className="flex min-w-0 flex-1 items-center gap-2">
             <p className="text-latte-text truncate text-base font-semibold">
               {session.customTitle ?? session.title ?? session.sessionName}
@@ -115,22 +116,14 @@ export const LogModal = ({
               <ExternalLink className="h-4 w-4" />
             </Button>
           </div>
-        </div>
+        </Toolbar>
         {error && (
-          <div className="border-latte-red/40 bg-latte-red/10 text-latte-red mt-2 rounded-2xl border px-3 py-2 text-xs">
+          <Callout tone="error" size="xs" className="mt-2">
             {error}
-          </div>
+          </Callout>
         )}
         <div className="border-latte-surface2/50 bg-latte-crust/60 relative mt-3 min-h-[200px] w-full rounded-2xl border shadow-inner">
-          {loading && (
-            <div className="bg-latte-base/70 absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 rounded-2xl backdrop-blur-sm">
-              <div className="relative">
-                <div className="border-latte-lavender/20 h-8 w-8 rounded-full border-2" />
-                <div className="border-latte-lavender absolute inset-0 h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
-              </div>
-              <span className="text-latte-subtext0 text-xs font-medium">Loading log...</span>
-            </div>
-          )}
+          {loading && <LoadingOverlay label="Loading log..." size="sm" />}
           <Virtuoso
             ref={virtuosoRef}
             data={logLines}
@@ -148,14 +141,16 @@ export const LogModal = ({
             )}
           />
           {!isAtBottom && (
-            <button
+            <IconButton
               type="button"
               onClick={scrollToBottom}
               aria-label="Scroll to bottom"
-              className="border-latte-surface2 bg-latte-base/80 text-latte-text hover:border-latte-lavender/60 hover:text-latte-lavender focus-visible:ring-latte-lavender absolute bottom-2 right-2 inline-flex h-8 w-8 items-center justify-center rounded-full border shadow-md backdrop-blur transition focus-visible:outline-none focus-visible:ring-2"
+              className="absolute bottom-2 right-2"
+              variant="base"
+              size="sm"
             >
               <ArrowDown className="h-4 w-4" />
-            </button>
+            </IconButton>
           )}
         </div>
       </Card>

@@ -2,8 +2,19 @@ import { type DiffFile, type DiffSummary } from "@tmux-agent-monitor/shared";
 import { ChevronDown, ChevronUp, FileCheck, RefreshCw } from "lucide-react";
 import { memo, type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import {
+  Button,
+  Callout,
+  Card,
+  EmptyState,
+  InsetPanel,
+  LoadingOverlay,
+  MonoBlock,
+  PanelSection,
+  RowButton,
+  SectionHeader,
+  TagPill,
+} from "@/components/ui";
 
 import {
   diffLineClass,
@@ -125,12 +136,10 @@ export const DiffSection = memo(
 
     return (
       <Card className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h2 className="font-display text-latte-text text-base font-semibold tracking-tight">
-              Changes
-            </h2>
-            <p className="text-latte-text text-sm">
+        <SectionHeader
+          title="Changes"
+          description={
+            <>
               {diffSummary?.files.length ?? 0} file
               {(diffSummary?.files.length ?? 0) === 1 ? "" : "s"}
               {diffSummary && (
@@ -139,61 +148,52 @@ export const DiffSection = memo(
                   <span className="text-latte-red">-{totals?.deletions ?? "—"}</span>
                 </span>
               )}
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onRefresh}
-            disabled={diffLoading}
-            aria-label="Refresh changes"
-          >
-            <RefreshCw className="h-4 w-4" />
-            <span className="sr-only">Refresh</span>
-          </Button>
-        </div>
+            </>
+          }
+          action={
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onRefresh}
+              disabled={diffLoading}
+              aria-label="Refresh changes"
+            >
+              <RefreshCw className="h-4 w-4" />
+              <span className="sr-only">Refresh</span>
+            </Button>
+          }
+        />
         {diffSummary?.repoRoot && (
           <p className="text-latte-subtext0 text-xs">Repo: {formatPath(diffSummary.repoRoot)}</p>
         )}
         {diffSummary?.reason === "cwd_unknown" && (
-          <div className="border-latte-peach/40 bg-latte-peach/10 text-latte-peach rounded-2xl border px-4 py-2 text-xs">
+          <Callout tone="warning" size="xs">
             Working directory is unknown for this session.
-          </div>
+          </Callout>
         )}
         {diffSummary?.reason === "not_git" && (
-          <div className="border-latte-peach/40 bg-latte-peach/10 text-latte-peach rounded-2xl border px-4 py-2 text-xs">
+          <Callout tone="warning" size="xs">
             Current directory is not a git repository.
-          </div>
+          </Callout>
         )}
         {diffSummary?.reason === "error" && (
-          <div className="border-latte-red/40 bg-latte-red/10 text-latte-red rounded-2xl border px-4 py-2 text-xs">
+          <Callout tone="error" size="xs">
             Failed to load git status.
-          </div>
+          </Callout>
         )}
         {diffError && (
-          <div className="border-latte-red/40 bg-latte-red/10 text-latte-red rounded-2xl border px-4 py-2 text-xs">
+          <Callout tone="error" size="xs">
             {diffError}
-          </div>
+          </Callout>
         )}
         <div className={`relative ${diffLoading ? "min-h-[120px]" : ""}`}>
-          {diffLoading && (
-            <div className="bg-latte-base/70 pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-2xl backdrop-blur-sm">
-              <div className="flex flex-col items-center gap-3">
-                <div className="relative">
-                  <div className="border-latte-lavender/20 h-10 w-10 rounded-full border-2" />
-                  <div className="border-latte-lavender absolute inset-0 h-10 w-10 animate-spin rounded-full border-2 border-t-transparent" />
-                </div>
-                <span className="text-latte-subtext0 text-xs font-medium">Loading changes...</span>
-              </div>
-            </div>
-          )}
+          {diffLoading && <LoadingOverlay label="Loading changes..." blocking={false} />}
           {diffSummary && diffSummary.files.length === 0 && !diffSummary.reason && (
-            <div className="flex flex-col items-center gap-3 py-8 text-center">
-              <div className="bg-latte-green/10 flex h-12 w-12 items-center justify-center rounded-full">
-                <FileCheck className="text-latte-green h-6 w-6" />
-              </div>
-              <p className="text-latte-subtext0 text-sm">Working directory is clean</p>
-            </div>
+            <EmptyState
+              icon={<FileCheck className="text-latte-green h-6 w-6" />}
+              message="Working directory is clean"
+              iconWrapperClassName="bg-latte-green/10"
+            />
           )}
           <div className="flex flex-col gap-2">
             {diffSummary?.files.map((file) => {
@@ -211,23 +211,12 @@ export const DiffSection = memo(
                   ? "—"
                   : String(file.deletions);
               return (
-                <div
-                  key={`${file.path}-${file.status}`}
-                  className="border-latte-surface2/70 bg-latte-base/70 rounded-2xl border"
-                >
-                  <button
-                    type="button"
-                    onClick={() => onToggle(file.path)}
-                    className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left"
-                  >
+                <InsetPanel key={`${file.path}-${file.status}`}>
+                  <RowButton type="button" onClick={() => onToggle(file.path)}>
                     <div className="flex min-w-0 items-center gap-3">
-                      <span
-                        className={`${diffStatusClass(
-                          statusLabel,
-                        )} text-[10px] font-semibold uppercase tracking-[0.25em]`}
-                      >
+                      <TagPill tone="status" className={diffStatusClass(statusLabel)}>
                         {statusLabel}
-                      </span>
+                      </TagPill>
                       <span className="text-latte-text truncate text-sm">{file.path}</span>
                     </div>
                     <div className="flex items-center gap-3 text-xs">
@@ -240,18 +229,16 @@ export const DiffSection = memo(
                       )}
                       <span className="sr-only">{isOpen ? "Hide" : "Show"}</span>
                     </div>
-                  </button>
+                  </RowButton>
                   {isOpen && (
-                    <div className="border-latte-surface2/70 border-t px-3 py-2">
+                    <PanelSection>
                       {loadingFile && <p className="text-latte-subtext0 text-xs">Loading diff…</p>}
                       {!loadingFile && fileData?.binary && (
                         <p className="text-latte-subtext0 text-xs">Binary file (no diff).</p>
                       )}
                       {!loadingFile && !fileData?.binary && fileData?.patch && (
                         <div className="custom-scrollbar max-h-[360px] overflow-auto">
-                          <div className="text-latte-text w-max min-w-full whitespace-pre pl-4 font-mono text-xs">
-                            {renderedPatch?.nodes}
-                          </div>
+                          <MonoBlock>{renderedPatch?.nodes}</MonoBlock>
                           {renderedPatch?.truncated && (
                             <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
                               <span className="text-latte-subtext0">
@@ -276,9 +263,9 @@ export const DiffSection = memo(
                       {!loadingFile && !fileData?.binary && !fileData?.patch && (
                         <p className="text-latte-subtext0 text-xs">No diff available.</p>
                       )}
-                    </div>
+                    </PanelSection>
                   )}
-                </div>
+                </InsetPanel>
               );
             })}
           </div>

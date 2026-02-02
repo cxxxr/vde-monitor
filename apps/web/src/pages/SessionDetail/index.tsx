@@ -3,7 +3,7 @@ import { defaultDangerKeys } from "@tmux-agent-monitor/shared";
 import { ArrowLeft } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { Card } from "@/components/ui/card";
+import { Card } from "@/components/ui";
 import { buildSessionGroups } from "@/lib/session-group";
 import { useSessions } from "@/state/session-context";
 import { useTheme } from "@/state/theme-context";

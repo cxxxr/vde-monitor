@@ -1,0 +1,24 @@
+import { type ButtonHTMLAttributes, forwardRef } from "react";
+
+import { cn } from "@/lib/cn";
+
+type SurfaceButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
+
+const SurfaceButton = forwardRef<HTMLButtonElement, SurfaceButtonProps>(
+  ({ className, ...props }, ref) => {
+    return (
+      <button
+        ref={ref}
+        className={cn(
+          "border-latte-surface2/50 bg-latte-crust/60 hover:border-latte-lavender/50 hover:bg-latte-crust/80 focus-visible:ring-latte-lavender w-full rounded-2xl border px-3 py-3 text-left transition-all duration-200 hover:shadow-[0_4px_12px_rgba(114,135,253,0.15)] focus-visible:outline-none focus-visible:ring-2",
+          className,
+        )}
+        {...props}
+      />
+    );
+  },
+);
+
+SurfaceButton.displayName = "SurfaceButton";
+
+export { SurfaceButton };

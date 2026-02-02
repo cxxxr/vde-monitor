@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import type { ReactNode, RefObject } from "react";
 
-import { Button } from "@/components/ui/button";
+import { Button, Callout, ModifierToggle, PillToggle, Toolbar } from "@/components/ui";
 
 type ControlsPanelProps = {
   readOnly: boolean;
@@ -72,9 +72,9 @@ export const ControlsPanel = ({
 
   if (readOnly) {
     return (
-      <div className="border-latte-peach/50 bg-latte-peach/10 text-latte-peach rounded-2xl border px-4 py-2 text-sm">
+      <Callout tone="warning" size="sm">
         Read-only mode is active. Interactive controls are hidden.
-      </div>
+      </Callout>
     );
   }
 
@@ -95,7 +95,7 @@ export const ControlsPanel = ({
           </Button>
         </div>
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <Toolbar>
         <Button
           variant="ghost"
           size="sm"
@@ -107,55 +107,33 @@ export const ControlsPanel = ({
           {controlsOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           Keys
         </Button>
-        <button
+        <PillToggle
           type="button"
           onClick={onToggleAutoEnter}
-          aria-pressed={autoEnter}
+          active={autoEnter}
           title="Auto-enter after send"
-          className={`group inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] transition ${
-            autoEnter
-              ? "border-latte-lavender/60 bg-latte-lavender/10 text-latte-lavender shadow-[inset_0_0_0_1px_rgba(114,135,253,0.12)]"
-              : "border-latte-surface2/70 text-latte-subtext0 hover:border-latte-overlay1 hover:text-latte-text"
-          }`}
+          className="group"
         >
           <span className="text-[9px] font-semibold tracking-[0.3em]">Auto</span>
           <CornerDownLeft className="h-3.5 w-3.5" />
           <span className="sr-only">Auto-enter</span>
-        </button>
-      </div>
+        </PillToggle>
+      </Toolbar>
       {controlsOpen && (
         <div id="session-controls" className="space-y-4">
           <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={onToggleShift}
-              aria-pressed={shiftHeld}
-              className={`inline-flex items-center gap-1.5 rounded-lg border-2 px-3 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] transition-all ${
-                shiftHeld
-                  ? "border-latte-mauve bg-latte-mauve/20 text-latte-mauve shadow-[0_0_12px_rgb(var(--ctp-mauve)/0.4)]"
-                  : "border-latte-surface2 text-latte-subtext0 hover:border-latte-overlay1 hover:text-latte-text"
-              }`}
-            >
+            <ModifierToggle type="button" onClick={onToggleShift} active={shiftHeld} tone="mauve">
               <span
                 className={`h-2 w-2 rounded-full transition-colors ${shiftHeld ? "bg-latte-mauve" : "bg-latte-surface2"}`}
               />
               Shift
-            </button>
-            <button
-              type="button"
-              onClick={onToggleCtrl}
-              aria-pressed={ctrlHeld}
-              className={`inline-flex items-center gap-1.5 rounded-lg border-2 px-3 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] transition-all ${
-                ctrlHeld
-                  ? "border-latte-blue bg-latte-blue/20 text-latte-blue shadow-[0_0_12px_rgb(var(--ctp-blue)/0.4)]"
-                  : "border-latte-surface2 text-latte-subtext0 hover:border-latte-overlay1 hover:text-latte-text"
-              }`}
-            >
+            </ModifierToggle>
+            <ModifierToggle type="button" onClick={onToggleCtrl} active={ctrlHeld} tone="blue">
               <span
                 className={`h-2 w-2 rounded-full transition-colors ${ctrlHeld ? "bg-latte-blue" : "bg-latte-surface2"}`}
               />
               Ctrl
-            </button>
+            </ModifierToggle>
           </div>
           <div className="space-y-2">
             <div className="flex flex-wrap gap-2">

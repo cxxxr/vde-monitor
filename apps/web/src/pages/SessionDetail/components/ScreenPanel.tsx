@@ -2,9 +2,17 @@ import { ArrowDown, FileText, Image, RefreshCw } from "lucide-react";
 import { forwardRef, type HTMLAttributes, type ReactNode, type RefObject } from "react";
 import { Virtuoso, type VirtuosoHandle } from "react-virtuoso";
 
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Button,
+  Callout,
+  Card,
+  IconButton,
+  LoadingOverlay,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  Toolbar,
+} from "@/components/ui";
 import type { ScreenMode } from "@/lib/screen-loading";
 
 type ScreenPanelProps = {
@@ -66,7 +74,7 @@ export const ScreenPanel = ({
 }: ScreenPanelProps) => {
   return (
     <Card className="flex min-w-0 flex-col gap-3 p-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <Toolbar className="gap-3">
         <div className="flex items-center gap-2">
           <Tabs
             value={mode}
@@ -101,27 +109,19 @@ export const ScreenPanel = ({
           <RefreshCw className="h-4 w-4" />
           <span className="sr-only">{connected ? "Refresh" : "Reconnect"}</span>
         </Button>
-      </div>
+      </Toolbar>
       {fallbackReason && (
-        <div className="border-latte-peach/40 bg-latte-peach/10 text-latte-peach rounded-2xl border px-4 py-2 text-xs">
+        <Callout tone="warning" size="xs">
           Image fallback: {fallbackReason}
-        </div>
+        </Callout>
       )}
       {error && (
-        <div className="border-latte-red/40 bg-latte-red/10 text-latte-red rounded-2xl border px-4 py-2 text-xs">
+        <Callout tone="error" size="xs">
           {error}
-        </div>
+        </Callout>
       )}
       <div className="border-latte-surface2/80 bg-latte-crust/95 relative min-h-[320px] w-full min-w-0 max-w-full flex-1 rounded-2xl border-2 shadow-inner">
-        {isScreenLoading && (
-          <div className="bg-latte-base/70 absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-2xl backdrop-blur-sm">
-            <div className="relative">
-              <div className="border-latte-lavender/20 h-10 w-10 rounded-full border-2" />
-              <div className="border-latte-lavender absolute inset-0 h-10 w-10 animate-spin rounded-full border-2 border-t-transparent" />
-            </div>
-            <span className="text-latte-subtext0 text-xs font-medium">Loading screen...</span>
-          </div>
-        )}
+        {isScreenLoading && <LoadingOverlay label="Loading screen..." />}
         {mode === "image" && imageBase64 ? (
           <div className="flex w-full items-center justify-center p-3">
             <img
@@ -149,14 +149,16 @@ export const ScreenPanel = ({
               )}
             />
             {!isAtBottom && (
-              <button
+              <IconButton
                 type="button"
                 onClick={() => onScrollToBottom("smooth")}
                 aria-label="Scroll to bottom"
-                className="border-latte-surface2 bg-latte-base/80 text-latte-text hover:border-latte-lavender/60 hover:text-latte-lavender focus-visible:ring-latte-lavender absolute bottom-2 right-2 inline-flex h-8 w-8 items-center justify-center rounded-full border shadow-md backdrop-blur transition focus-visible:outline-none focus-visible:ring-2"
+                className="absolute bottom-2 right-2"
+                variant="base"
+                size="sm"
               >
                 <ArrowDown className="h-4 w-4" />
-              </button>
+              </IconButton>
             )}
           </>
         )}

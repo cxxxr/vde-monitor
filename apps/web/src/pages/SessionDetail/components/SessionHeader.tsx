@@ -3,7 +3,7 @@ import type { SessionDetail } from "@tmux-agent-monitor/shared";
 import { ArrowLeft, X } from "lucide-react";
 
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Badge } from "@/components/ui/badge";
+import { Badge, Callout, IconButton, LastInputPill, TagPill, TextButton } from "@/components/ui";
 
 import {
   agentLabelFor,
@@ -96,43 +96,39 @@ export const SessionHeader = ({
                   autoFocus
                 />
               ) : (
-                <button
+                <TextButton
                   type="button"
                   onClick={onOpenTitleEditor}
                   disabled={readOnly}
-                  className={`font-display text-latte-text text-left text-xl transition ${
+                  variant="title"
+                  className={`transition ${
                     readOnly ? "cursor-default" : "hover:text-latte-lavender cursor-text"
                   } disabled:opacity-70`}
                   aria-label="Edit session title"
                 >
                   {sessionDisplayTitle}
-                </button>
+                </TextButton>
               )}
               {sessionCustomTitle && !readOnly && !titleEditing && (
-                <button
+                <IconButton
                   type="button"
                   onClick={() => void onTitleClear()}
                   disabled={titleSaving}
-                  className="border-latte-surface2 text-latte-subtext0 hover:text-latte-red hover:border-latte-red/60 inline-flex h-6 w-6 items-center justify-center rounded-full border transition disabled:cursor-not-allowed disabled:opacity-60"
+                  variant="dangerOutline"
+                  size="xs"
                   aria-label="Clear custom title"
                   title="Clear custom title"
                 >
                   <X className="h-3.5 w-3.5" />
-                </button>
+                </IconButton>
               )}
             </div>
             <div className="space-y-4">
               <p className="text-latte-subtext0 text-sm">{formatPath(session.currentPath)}</p>
               <div className="text-latte-overlay1 flex flex-wrap items-center gap-2 text-[11px] font-semibold">
-                <span className="border-latte-surface2/60 bg-latte-crust/40 rounded-full border px-3 py-1">
-                  Session {session.sessionName}
-                </span>
-                <span className="border-latte-surface2/60 bg-latte-crust/40 rounded-full border px-3 py-1">
-                  Window {session.windowIndex}
-                </span>
-                <span className="border-latte-surface2/60 bg-latte-crust/40 rounded-full border px-3 py-1">
-                  Pane {session.paneId}
-                </span>
+                <TagPill tone="meta">Session {session.sessionName}</TagPill>
+                <TagPill tone="meta">Window {session.windowIndex}</TagPill>
+                <TagPill tone="meta">Pane {session.paneId}</TagPill>
               </div>
             </div>
             {titleError && <p className="text-latte-red text-xs">{titleError}</p>}
@@ -141,30 +137,29 @@ export const SessionHeader = ({
             <Badge tone={stateTone(session.state)}>{session.state}</Badge>
             <div className="flex flex-wrap items-center gap-2">
               <Badge tone={agentTone}>{agentLabel}</Badge>
-              <span
-                className={`${lastInputTone.pill} inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-semibold`}
-              >
-                <span className={`h-1.5 w-1.5 rounded-full ${lastInputTone.dot}`} />
-                <span className="text-[9px] uppercase tracking-[0.2em]">Last input</span>
-                <span>{formatRelativeTime(session.lastInputAt, nowMs)}</span>
-              </span>
+              <LastInputPill
+                tone={lastInputTone}
+                label="Last input"
+                value={formatRelativeTime(session.lastInputAt, nowMs)}
+                size="sm"
+              />
             </div>
           </div>
         </div>
         {session.pipeConflict && (
-          <div className="border-latte-red/40 bg-latte-red/10 text-latte-red rounded-2xl border px-4 py-2 text-sm">
+          <Callout tone="error" size="sm">
             Another pipe-pane is attached. Screen is capture-only.
-          </div>
+          </Callout>
         )}
         {readOnly && (
-          <div className="border-latte-peach/50 bg-latte-peach/10 text-latte-peach rounded-2xl border px-4 py-2 text-sm">
+          <Callout tone="warning" size="sm">
             Read-only mode is active. Actions are disabled.
-          </div>
+          </Callout>
         )}
         {connectionIssue && (
-          <div className="border-latte-peach/50 bg-latte-peach/10 text-latte-peach rounded-2xl border px-4 py-2 text-sm">
+          <Callout tone="warning" size="sm">
             {connectionIssue}
-          </div>
+          </Callout>
         )}
       </header>
     </>
