@@ -12,4 +12,4 @@ export const resolveTheme = (preference: ThemePreference): Theme => {
   return window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ? "mocha" : "latte";
 };
 
-export const THEME_STORAGE_KEY = "tmux-agent-monitor-theme";
+export const THEME_STORAGE_KEY = "vde-monitor-theme";

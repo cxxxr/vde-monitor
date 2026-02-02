@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import type { SessionDetail } from "@tmux-agent-monitor/shared";
+import type { SessionDetail } from "@vde-monitor/shared";
 import { ArrowLeft, Clock, X } from "lucide-react";
 
 import { ThemeToggle } from "@/components/theme-toggle";

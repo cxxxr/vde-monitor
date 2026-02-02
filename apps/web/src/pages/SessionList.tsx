@@ -57,9 +57,7 @@ export const SessionListPage = () => {
       <header className="shadow-glass border-latte-surface1/60 bg-latte-base/80 animate-fade-in stagger-1 flex flex-col gap-4 rounded-[32px] border p-6 opacity-0 backdrop-blur">
         <Toolbar className="gap-3">
           <div>
-            <p className="text-latte-subtext0 text-xs uppercase tracking-[0.5em]">
-              tmux-agent-monitor
-            </p>
+            <p className="text-latte-subtext0 text-xs uppercase tracking-[0.5em]">vde-monitor</p>
             <h1 className="font-display text-latte-text text-4xl font-semibold tracking-tight">
               Live Sessions
             </h1>

@@ -1,15 +1,15 @@
 {
-  "name": "@tmux-agent-monitor/hooks",
+  "name": "@vde-monitor/hooks",
   "private": true,
   "version": "0.0.1",
   "type": "module",
   "bin": {
-    "tmux-agent-monitor-hook": "./src/cli.ts"
+    "vde-monitor-hook": "./src/cli.ts"
   },
   "exports": {
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@tmux-agent-monitor/shared": "workspace:*"
+    "@vde-monitor/shared": "workspace:*"
   }
 }

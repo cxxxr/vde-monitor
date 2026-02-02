@@ -1,4 +1,4 @@
-# tmux-agent-monitor
+# vde-monitor
 
 Monitor tmux sessions from a mobile-friendly web UI with a single CLI. Designed for Codex CLI and Claude Code sessions running inside tmux.
 
@@ -21,19 +21,19 @@ Monitor tmux sessions from a mobile-friendly web UI with a single CLI. Designed 
 ## Install
 
 ```bash
-npm install -g tmux-agent-monitor
+npm install -g vde-monitor
 ```
 
 ## Quick start
 
 ```bash
-tmux-agent-monitor
+vde-monitor
 ```
 
 The command prints a URL like (and a QR code when possible):
 
 ```
-tmux-agent-monitor: http://localhost:11080/?token=...
+vde-monitor: http://localhost:11080/?token=...
 ```
 
 Open that URL in a browser to access the UI.
@@ -59,12 +59,12 @@ Recommended access methods:
 Rotate the auth token:
 
 ```bash
-tmux-agent-monitor token rotate
+vde-monitor token rotate
 ```
 
 ## Configuration
 
-Config is stored at `~/.tmux-agent-monitor/config.json`. It is created automatically on first run.
+Config is stored at `~/.vde-monitor/config.json`. It is created automatically on first run.
 
 Example (use Alacritty for image capture):
 
@@ -91,13 +91,13 @@ Security defaults:
 The repo includes a small hook logger CLI:
 
 ```bash
-tmux-agent-monitor-hook <HookEventName>
+vde-monitor-hook <HookEventName>
 ```
 
 To print a Claude hooks snippet:
 
 ```bash
-tmux-agent-monitor claude hooks print
+vde-monitor claude hooks print
 ```
 
 ## Development

@@ -3,10 +3,10 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-import type { AgentMonitorConfig } from "@tmux-agent-monitor/shared";
-import { configSchema, defaultConfig } from "@tmux-agent-monitor/shared";
+import type { AgentMonitorConfig } from "@vde-monitor/shared";
+import { configSchema, defaultConfig } from "@vde-monitor/shared";
 
-const configDirName = ".tmux-agent-monitor";
+const configDirName = ".vde-monitor";
 
 export const getConfigDir = () => {
   return path.join(os.homedir(), configDirName);

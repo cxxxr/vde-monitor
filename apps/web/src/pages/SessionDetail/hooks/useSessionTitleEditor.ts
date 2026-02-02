@@ -1,4 +1,4 @@
-import type { SessionDetail } from "@tmux-agent-monitor/shared";
+import type { SessionDetail } from "@vde-monitor/shared";
 import { useCallback, useEffect, useState } from "react";
 
 type UseSessionTitleEditorParams = {

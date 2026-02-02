@@ -5,7 +5,7 @@ import type {
   DiffFile,
   DiffSummary,
   SessionDetail,
-} from "@tmux-agent-monitor/shared";
+} from "@vde-monitor/shared";
 
 export const createSessionDetail = (overrides: Partial<SessionDetail> = {}): SessionDetail => ({
   paneId: "pane-1",

@@ -9,8 +9,8 @@ import type {
   SessionDetail,
   SessionSummary,
   WsServerMessage,
-} from "@tmux-agent-monitor/shared";
-import { encodePaneId } from "@tmux-agent-monitor/shared";
+} from "@vde-monitor/shared";
+import { encodePaneId } from "@vde-monitor/shared";
 import { hc } from "hono/client";
 import {
   createContext,
@@ -68,7 +68,7 @@ type SessionContextValue = {
 
 const SessionContext = createContext<SessionContextValue | null>(null);
 
-const TOKEN_KEY = "tmux-agent-monitor-token";
+const TOKEN_KEY = "vde-monitor-token";
 const HEALTH_INTERVAL_MS = 5000;
 const HEALTH_TIMEOUT_MS = 10000;
 

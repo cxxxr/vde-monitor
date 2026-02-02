@@ -13,7 +13,7 @@ import {
   wsClientMessageSchema,
   type WsEnvelope,
   type WsServerMessage,
-} from "@tmux-agent-monitor/shared";
+} from "@vde-monitor/shared";
 import { Hono } from "hono";
 import type { WSContext } from "hono/ws";
 import { z } from "zod";

@@ -1,4 +1,4 @@
-import type { ScreenResponse, SessionSummary } from "@tmux-agent-monitor/shared";
+import type { ScreenResponse, SessionSummary } from "@vde-monitor/shared";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { renderAnsiLines } from "@/lib/ansi";

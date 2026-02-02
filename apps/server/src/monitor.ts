@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 
-import { estimateState } from "@tmux-agent-monitor/agents";
+import { estimateState } from "@vde-monitor/agents";
 import {
   type AgentMonitorConfig,
   claudeHookEventSchema,
@@ -13,13 +13,13 @@ import {
   resolveServerKey,
   type SessionDetail,
   type SessionStateValue,
-} from "@tmux-agent-monitor/shared";
+} from "@vde-monitor/shared";
 import {
   createInspector,
   createPipeManager,
   createScreenCapture,
   type TmuxAdapter,
-} from "@tmux-agent-monitor/tmux";
+} from "@vde-monitor/tmux";
 
 import { resolveActivityTimestamp } from "./activity-resolver.js";
 import {
@@ -36,7 +36,7 @@ type HookEventContext = {
   hookState: HookStateSignal;
 };
 
-const baseDir = path.join(os.homedir(), ".tmux-agent-monitor");
+const baseDir = path.join(os.homedir(), ".vde-monitor");
 
 const execFileAsync = promisify(execFile);
 
@@ -396,7 +396,7 @@ export const createSessionMonitor = (adapter: TmuxAdapter, config: AgentMonitorC
 
     for (const pane of panes) {
       if (pane.pipeTagValue === null) {
-        const fallback = await inspector.readUserOption(pane.paneId, "@tmux-agent-monitor_pipe");
+        const fallback = await inspector.readUserOption(pane.paneId, "@vde-monitor_pipe");
         pane.pipeTagValue = fallback;
       }
 

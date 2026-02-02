@@ -1,4 +1,4 @@
-import type { CommitDetail, CommitFileDiff, CommitLog } from "@tmux-agent-monitor/shared";
+import type { CommitDetail, CommitFileDiff, CommitLog } from "@vde-monitor/shared";
 import {
   ArrowDown,
   Check,

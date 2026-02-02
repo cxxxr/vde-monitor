@@ -1,4 +1,4 @@
-import type { SessionSummary } from "@tmux-agent-monitor/shared";
+import type { SessionSummary } from "@vde-monitor/shared";
 import { describe, expect, it } from "vitest";
 
 import { buildSessionGroups } from "./session-group";

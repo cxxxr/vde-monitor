@@ -94,7 +94,7 @@ describe("createInspector", () => {
       run: vi.fn().mockResolvedValue({ stdout: " value \n", stderr: "", exitCode: 0 }),
     };
     const inspector = createInspector(adapter);
-    const result = await inspector.readUserOption("%1", "@tmux-agent-monitor");
+    const result = await inspector.readUserOption("%1", "@vde-monitor");
     expect(result).toBe("value");
   });
 
@@ -103,7 +103,7 @@ describe("createInspector", () => {
       run: vi.fn().mockResolvedValue({ stdout: "   \n", stderr: "", exitCode: 0 }),
     };
     const inspector = createInspector(adapter);
-    const result = await inspector.readUserOption("%1", "@tmux-agent-monitor");
+    const result = await inspector.readUserOption("%1", "@vde-monitor");
     expect(result).toBeNull();
   });
 
@@ -112,7 +112,7 @@ describe("createInspector", () => {
       run: vi.fn().mockResolvedValue({ stdout: "", stderr: "fail", exitCode: 1 }),
     };
     const inspector = createInspector(adapter);
-    const result = await inspector.readUserOption("%1", "@tmux-agent-monitor");
+    const result = await inspector.readUserOption("%1", "@vde-monitor");
     expect(result).toBeNull();
   });
 
@@ -121,23 +121,11 @@ describe("createInspector", () => {
       run: vi.fn().mockResolvedValue({ stdout: "", stderr: "", exitCode: 0 }),
     };
     const inspector = createInspector(adapter);
-    await inspector.writeUserOption("%1", "@tmux-agent-monitor", "1");
-    await inspector.writeUserOption("%1", "@tmux-agent-monitor", null);
+    await inspector.writeUserOption("%1", "@vde-monitor", "1");
+    await inspector.writeUserOption("%1", "@vde-monitor", null);
 
-    expect(adapter.run).toHaveBeenCalledWith([
-      "set-option",
-      "-t",
-      "%1",
-      "@tmux-agent-monitor",
-      "1",
-    ]);
-    expect(adapter.run).toHaveBeenCalledWith([
-      "set-option",
-      "-t",
-      "%1",
-      "-u",
-      "@tmux-agent-monitor",
-    ]);
+    expect(adapter.run).toHaveBeenCalledWith(["set-option", "-t", "%1", "@vde-monitor", "1"]);
+    expect(adapter.run).toHaveBeenCalledWith(["set-option", "-t", "%1", "-u", "@vde-monitor"]);
   });
 
   it("throws when list-panes fails", async () => {

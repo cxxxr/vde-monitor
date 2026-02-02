@@ -1,4 +1,4 @@
-import type { DiffFile, DiffSummary } from "@tmux-agent-monitor/shared";
+import type { DiffFile, DiffSummary } from "@vde-monitor/shared";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { AUTO_REFRESH_INTERVAL_MS, buildDiffSummarySignature } from "../sessionDetailUtils";

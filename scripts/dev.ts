@@ -65,7 +65,7 @@ const startServer = (webPort: number) => {
   if (serverProcess) {
     return;
   }
-  const args = ["--filter", "@tmux-agent-monitor/server", "dev", "--"];
+  const args = ["--filter", "@vde-monitor/server", "dev", "--"];
   if (isPublic) {
     args.push("--public");
   }
@@ -86,7 +86,7 @@ const startServer = (webPort: number) => {
   });
 };
 
-const webArgs = ["--filter", "@tmux-agent-monitor/web", isPublic ? "dev:public" : "dev"];
+const webArgs = ["--filter", "@vde-monitor/web", isPublic ? "dev:public" : "dev"];
 const webProcess = spawnPnpm(webArgs);
 
 const handleWebOutput = (data: Buffer, isError = false) => {

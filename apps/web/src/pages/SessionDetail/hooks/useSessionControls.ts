@@ -1,4 +1,4 @@
-import { type CommandResponse, defaultDangerKeys } from "@tmux-agent-monitor/shared";
+import { type CommandResponse, defaultDangerKeys } from "@vde-monitor/shared";
 import { useCallback, useRef, useState } from "react";
 
 import type { ScreenMode } from "@/lib/screen-loading";

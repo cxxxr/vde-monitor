@@ -3,7 +3,7 @@ import { defineConfig } from "tsdown";
 export default defineConfig({
   entry: {
     index: "apps/server/src/index.ts",
-    "tmux-agent-monitor-hook": "packages/hooks/src/cli.ts",
+    "vde-monitor-hook": "packages/hooks/src/cli.ts",
   },
   format: "esm",
   platform: "node",

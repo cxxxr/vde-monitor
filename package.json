@@ -1,11 +1,11 @@
 {
-  "name": "tmux-agent-monitor",
+  "name": "vde-monitor",
   "description": "Monitor tmux sessions with a web UI.",
   "author": "Yuki Yano",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yuki-yano/tmux-agent-monitor.git"
+    "url": "https://github.com/yuki-yano/vde-monitor.git"
   },
   "version": "0.1.2",
   "type": "module",
@@ -14,8 +14,8 @@
     "node": ">=24"
   },
   "bin": {
-    "tmux-agent-monitor": "dist/index.js",
-    "tmux-agent-monitor-hook": "dist/tmux-agent-monitor-hook.js"
+    "vde-monitor": "dist/index.js",
+    "vde-monitor-hook": "dist/vde-monitor-hook.js"
   },
   "files": [
     "dist/**",
@@ -25,15 +25,15 @@
   ],
   "scripts": {
     "build": "tsx scripts/build-package.ts",
-    "build:web": "pnpm --filter @tmux-agent-monitor/web build",
+    "build:web": "pnpm --filter @vde-monitor/web build",
     "build:bundle": "tsdown --config tsdown.config.ts",
     "prepack": "pnpm build",
     "dev": "tsx scripts/dev.ts",
     "dev:public": "tsx scripts/dev.ts --public",
-    "dev:server": "pnpm --filter @tmux-agent-monitor/server dev",
-    "dev:server:public": "pnpm --filter @tmux-agent-monitor/server dev -- --public",
-    "dev:web": "pnpm --filter @tmux-agent-monitor/web dev",
-    "dev:web:public": "pnpm --filter @tmux-agent-monitor/web dev:public",
+    "dev:server": "pnpm --filter @vde-monitor/server dev",
+    "dev:server:public": "pnpm --filter @vde-monitor/server dev -- --public",
+    "dev:web": "pnpm --filter @vde-monitor/web dev",
+    "dev:web:public": "pnpm --filter @vde-monitor/web dev:public",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",

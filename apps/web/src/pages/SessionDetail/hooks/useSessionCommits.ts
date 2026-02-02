@@ -1,4 +1,4 @@
-import type { CommitDetail, CommitFileDiff, CommitLog } from "@tmux-agent-monitor/shared";
+import type { CommitDetail, CommitFileDiff, CommitLog } from "@vde-monitor/shared";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { AUTO_REFRESH_INTERVAL_MS, buildCommitLogSignature } from "../sessionDetailUtils";

@@ -1,4 +1,4 @@
-import { type DiffFile, type DiffSummary } from "@tmux-agent-monitor/shared";
+import { type DiffFile, type DiffSummary } from "@vde-monitor/shared";
 import { ChevronDown, ChevronUp, FileCheck, RefreshCw } from "lucide-react";
 import { memo, type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 

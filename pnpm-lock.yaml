@@ -105,13 +105,13 @@ importers:
       '@hono/zod-validator':
         specifier: ^0.7.6
         version: 0.7.6(hono@4.11.7)(zod@4.3.6)
-      '@tmux-agent-monitor/agents':
+      '@vde-monitor/agents':
         specifier: workspace:*
         version: link:../../packages/agents
-      '@tmux-agent-monitor/shared':
+      '@vde-monitor/shared':
         specifier: workspace:*
         version: link:../../packages/shared
-      '@tmux-agent-monitor/tmux':
+      '@vde-monitor/tmux':
         specifier: workspace:*
         version: link:../../packages/tmux
       hono:
@@ -145,7 +145,7 @@ importers:
       '@tanstack/react-router':
         specifier: ^1.157.17
         version: 1.157.17(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@tmux-agent-monitor/shared':
+      '@vde-monitor/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       ansi-to-html:
@@ -208,7 +208,7 @@ importers:
 
   packages/hooks:
     dependencies:
-      '@tmux-agent-monitor/shared':
+      '@vde-monitor/shared':
         specifier: workspace:*
         version: link:../shared
 

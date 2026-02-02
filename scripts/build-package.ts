@@ -8,7 +8,7 @@ const pnpmCmd = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
 const run = (args: string[], label: string) => {
   const result = spawnSync(pnpmCmd, args, { stdio: "inherit" });
   if (result.status !== 0) {
-    process.stderr.write(`\n[tmux-agent-monitor] ${label} failed.\n`);
+    process.stderr.write(`\n[vde-monitor] ${label} failed.\n`);
     process.exit(result.status ?? 1);
   }
 };
@@ -31,7 +31,7 @@ const findBundle = (dir: string, base: string) => {
 };
 
 const main = () => {
-  run(["--filter", "@tmux-agent-monitor/web", "build"], "web build");
+  run(["--filter", "@vde-monitor/web", "build"], "web build");
   run(["run", "build:bundle"], "bundle build");
 
   const distDir = path.resolve("dist");
@@ -39,9 +39,7 @@ const main = () => {
   const targetWebDir = path.join(distDir, "web");
 
   if (!fs.existsSync(webDist)) {
-    process.stderr.write(
-      "\n[tmux-agent-monitor] apps/web/dist not found. Did the web build fail?\n",
-    );
+    process.stderr.write("\n[vde-monitor] apps/web/dist not found. Did the web build fail?\n");
     process.exit(1);
   }
 
@@ -49,12 +47,12 @@ const main = () => {
   fs.mkdirSync(targetWebDir, { recursive: true });
   fs.cpSync(webDist, targetWebDir, { recursive: true });
 
-  const hookBundle = findBundle(distDir, "tmux-agent-monitor-hook");
+  const hookBundle = findBundle(distDir, "vde-monitor-hook");
   if (!hookBundle) {
-    process.stderr.write("\n[tmux-agent-monitor] hook bundle not found in dist.\n");
+    process.stderr.write("\n[vde-monitor] hook bundle not found in dist.\n");
     process.exit(1);
   }
-  const hookTarget = path.join(distDir, "tmux-agent-monitor-hook.js");
+  const hookTarget = path.join(distDir, "vde-monitor-hook.js");
   fs.rmSync(hookTarget, { force: true });
   if (hookBundle !== hookTarget) {
     fs.renameSync(hookBundle, hookTarget);
@@ -62,7 +60,7 @@ const main = () => {
 
   const mainBundle = findBundle(distDir, "index");
   if (!mainBundle) {
-    process.stderr.write("\n[tmux-agent-monitor] main bundle not found in dist.\n");
+    process.stderr.write("\n[vde-monitor] main bundle not found in dist.\n");
     process.exit(1);
   }
   const mainTarget = path.join(distDir, "index.js");

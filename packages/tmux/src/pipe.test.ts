@@ -33,13 +33,7 @@ describe("createPipeManager", () => {
       "%2",
       'cat >> "/tmp/test.log"',
     ]);
-    expect(adapter.run).toHaveBeenCalledWith([
-      "set-option",
-      "-t",
-      "%2",
-      "@tmux-agent-monitor_pipe",
-      "1",
-    ]);
+    expect(adapter.run).toHaveBeenCalledWith(["set-option", "-t", "%2", "@vde-monitor_pipe", "1"]);
   });
 
   it("escapes quotes in log path when attaching", async () => {

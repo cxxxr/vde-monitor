@@ -2,7 +2,7 @@ import {
   type CommitLog,
   defaultDangerCommandPatterns,
   type DiffSummary,
-} from "@tmux-agent-monitor/shared";
+} from "@vde-monitor/shared";
 
 export type { LastInputTone } from "@/lib/session-format";
 export {

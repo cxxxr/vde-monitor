@@ -1,4 +1,4 @@
-import type { SessionSummary } from "@tmux-agent-monitor/shared";
+import type { SessionSummary } from "@vde-monitor/shared";
 import { ArrowDown, CornerDownLeft, ExternalLink, X } from "lucide-react";
 import { forwardRef, type HTMLAttributes, useEffect, useRef, useState } from "react";
 import { Virtuoso, type VirtuosoHandle } from "react-virtuoso";

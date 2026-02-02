@@ -1,4 +1,4 @@
-import type { SessionSummary } from "@tmux-agent-monitor/shared";
+import type { SessionSummary } from "@vde-monitor/shared";
 
 export type SessionGroup = {
   repoRoot: string | null;

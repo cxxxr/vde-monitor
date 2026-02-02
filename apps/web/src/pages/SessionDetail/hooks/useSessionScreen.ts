@@ -1,4 +1,4 @@
-import type { ScreenResponse } from "@tmux-agent-monitor/shared";
+import type { ScreenResponse } from "@vde-monitor/shared";
 import {
   startTransition,
   useCallback,
